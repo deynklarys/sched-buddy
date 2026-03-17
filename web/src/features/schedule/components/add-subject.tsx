@@ -54,6 +54,7 @@ type Time = z.infer<typeof timeSchema>
 
 const addMeetingSchema = z.object({
   instructor: z.string().min(1, 'Meeting instructor is required'),
+  days: z.array(z.enum(days)).min(1, 'Add at least one day must be selected.'),
   startTime: timeSchema,
   endTime: timeSchema,
 })
@@ -66,6 +67,7 @@ const addSubjectSchema = z.object({
 
 const defaultMeeting: z.infer<typeof addMeetingSchema> = {
   instructor: '',
+  days: [],
   startTime: { hours: 0, minutes: 0, meridiem: 'am' },
   endTime: { hours: 0, minutes: 0, meridiem: 'am' },
 }
@@ -236,29 +238,59 @@ function AddSubject() {
                           )
                         }}
                       />
-                      <div className='flex flex-row justify-between'>
-                        {days.map((day) => {
+
+                      <Controller
+                        name={`meetings.${index}.days`}
+                        control={form.control}
+                        render={({ field: controllerField, fieldState }) => {
                           return (
-                            <Field
-                              key={`add-subject_meetings.${index}.day.${day}`}
-                              orientation='vertical'
-                              className='items-center [&>*]:w-min'
-                            >
-                              <FieldLabel
-                                htmlFor={`add-subject_meetings.${index}.day.${day}`}
-                                className='font-normal hover:cursor-pointer'
-                                defaultChecked
+                            <>
+                              <FieldGroup
+                                data-slot='checkbox-group'
+                                className='flex flex-row justify-between'
                               >
-                                {formatDay(day, 'title', true)}
-                              </FieldLabel>
-                              <Checkbox
-                                id={`add-subject_meetings.${index}.day.${day}`}
-                                className='size-4!'
-                              />
-                            </Field>
+                                {days.map((day) => {
+                                  return (
+                                    <Field
+                                      key={`add-subject_meetings.${index}.day.${day}`}
+                                      data-invalid={fieldState.invalid}
+                                      orientation='vertical'
+                                      className='items-center [&>*]:w-min'
+                                    >
+                                      <FieldLabel
+                                        htmlFor={`add-subject_meetings.${index}.day.${day}`}
+                                        className='font-normal hover:cursor-pointer'
+                                        defaultChecked
+                                      >
+                                        {formatDay(day, 'title', true)}
+                                      </FieldLabel>
+                                      <Checkbox
+                                        name={controllerField.name}
+                                        id={`add-subject_meetings.${index}.day.${day}`}
+                                        className='size-4!'
+                                        checked={controllerField.value.includes(
+                                          day,
+                                        )}
+                                        onCheckedChange={(checked) => {
+                                          const newValues = checked
+                                            ? [...controllerField.value, day]
+                                            : controllerField.value.filter(
+                                                (value) => value !== day,
+                                              )
+                                          controllerField.onChange(newValues)
+                                        }}
+                                      />
+                                    </Field>
+                                  )
+                                })}
+                              </FieldGroup>
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </>
                           )
-                        })}
-                      </div>
+                        }}
+                      />
                       <Controller
                         name={`meetings.${index}.startTime`}
                         control={form.control}
