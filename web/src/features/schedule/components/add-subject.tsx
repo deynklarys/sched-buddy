@@ -217,193 +217,208 @@ function AddSubject() {
                       )}
                     </div>
                     <FieldGroup className='m-2 w-auto overflow-hidden rounded-md border p-2'>
-                      <Controller
-                        name={`meetings.${index}.type`}
-                        control={form.control}
-                        render={({ field: controllerField, fieldState }) => {
-                          return (
-                            <Field data-invalid={fieldState.invalid}>
-                              <FieldLabel
-                                htmlFor={`add-subject_meetings.${index}.type`}
-                              >
-                                Type
-                              </FieldLabel>
-                              <Input
-                                {...controllerField}
-                                id={`add-subject_meetings.${index}.type`}
-                                placeholder='optional (ex. Lab, Lecture, Online Class)'
-                                autoComplete='off'
-                                aria-invalid={fieldState.invalid}
-                              />
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                              )}
-                            </Field>
-                          )
-                        }}
-                      />
-
-                      <Controller
-                        name={`meetings.${index}.instructor`}
-                        control={form.control}
-                        render={({ field: controllerField, fieldState }) => {
-                          return (
-                            <Field data-invalid={fieldState.invalid}>
-                              <FieldLabel
-                                htmlFor={`add-subject_meetings.${index}.instructor`}
-                              >
-                                Instructor
-                              </FieldLabel>
-                              <Input
-                                {...controllerField}
-                                id={`add-subject_meetings.${index}.instructor`}
-                                placeholder='optional'
-                                autoComplete='off'
-                                aria-invalid={fieldState.invalid}
-                              />
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                              )}
-                            </Field>
-                          )
-                        }}
-                      />
-
-                      <Controller
-                        name={`meetings.${index}.location`}
-                        control={form.control}
-                        render={({ field: controllerField, fieldState }) => {
-                          return (
-                            <Field data-invalid={fieldState.invalid}>
-                              <FieldLabel
-                                htmlFor={`add-subject_meetings.${index}.location`}
-                              >
-                                Location
-                              </FieldLabel>
-                              <Input
-                                {...controllerField}
-                                id={`add-subject_meetings.${index}.location`}
-                                placeholder='optional (ex BUCS B2-201)'
-                                autoComplete='off'
-                                aria-invalid={fieldState.invalid}
-                              />
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                              )}
-                            </Field>
-                          )
-                        }}
-                      />
-
-                      <Controller
-                        name={`meetings.${index}.days`}
-                        control={form.control}
-                        render={({ field: controllerField, fieldState }) => {
-                          return (
-                            <>
-                              <FieldGroup
-                                data-slot='checkbox-group'
-                                className='flex flex-row justify-between'
-                              >
-                                {days.map((day) => {
-                                  return (
-                                    <Field
-                                      key={`add-subject_meetings.${index}.day.${day}`}
-                                      data-invalid={fieldState.invalid}
-                                      orientation='vertical'
-                                      className='items-center [&>*]:w-min'
-                                    >
-                                      <FieldLabel
-                                        htmlFor={`add-subject_meetings.${index}.day.${day}`}
-                                        className='font-normal hover:cursor-pointer'
-                                        defaultChecked
+                      <div className='flex flex-col gap-2 rounded-md bg-teal-100 p-2'>
+                        <Controller
+                          name={`meetings.${index}.days`}
+                          control={form.control}
+                          render={({ field: controllerField, fieldState }) => {
+                            return (
+                              <>
+                                <FieldGroup
+                                  data-slot='checkbox-group'
+                                  className='flex flex-row justify-between'
+                                >
+                                  {days.map((day) => {
+                                    return (
+                                      <Field
+                                        key={`add-subject_meetings.${index}.day.${day}`}
+                                        data-invalid={fieldState.invalid}
+                                        orientation='vertical'
+                                        className='items-center [&>*]:w-min'
                                       >
-                                        {formatDay(day, 'title', true)}
-                                      </FieldLabel>
-                                      <Checkbox
-                                        name={controllerField.name}
-                                        id={`add-subject_meetings.${index}.day.${day}`}
-                                        className='size-4!'
-                                        checked={controllerField.value.includes(
-                                          day,
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          const newValues = checked
-                                            ? [...controllerField.value, day]
-                                            : controllerField.value.filter(
-                                                (value) => value !== day,
-                                              )
-                                          controllerField.onChange(newValues)
-                                        }}
-                                      />
-                                    </Field>
-                                  )
-                                })}
-                              </FieldGroup>
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                              )}
-                            </>
-                          )
-                        }}
-                      />
-                      <Controller
-                        name={`meetings.${index}.startTime`}
-                        control={form.control}
-                        render={({ field: controllerField, fieldState }) => {
-                          return (
-                            <Field
-                              data-invalid={fieldState.invalid}
-                              className='flex flex-row gap-2'
-                            >
-                              <FieldLabel
-                                htmlFor={`meetings.${index}.startTime`}
-                                className='w-min! whitespace-nowrap'
+                                        <FieldLabel
+                                          htmlFor={`add-subject_meetings.${index}.day.${day}`}
+                                          className='font-normal hover:cursor-pointer'
+                                          defaultChecked
+                                        >
+                                          {formatDay(day, 'title', true)}
+                                        </FieldLabel>
+                                        <Checkbox
+                                          name={controllerField.name}
+                                          id={`add-subject_meetings.${index}.day.${day}`}
+                                          className='size-4!'
+                                          checked={controllerField.value.includes(
+                                            day,
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            const newValues = checked
+                                              ? [...controllerField.value, day]
+                                              : controllerField.value.filter(
+                                                  (value) => value !== day,
+                                                )
+                                            controllerField.onChange(newValues)
+                                          }}
+                                        />
+                                      </Field>
+                                    )
+                                  })}
+                                </FieldGroup>
+                                {fieldState.invalid && (
+                                  <FieldError errors={[fieldState.error]} />
+                                )}
+                              </>
+                            )
+                          }}
+                        />
+                        <Controller
+                          name={`meetings.${index}.startTime`}
+                          control={form.control}
+                          render={({ field: controllerField, fieldState }) => {
+                            return (
+                              <Field
+                                data-invalid={fieldState.invalid}
+                                className='flex flex-row gap-2'
                               >
-                                Start Time
-                              </FieldLabel>
-                              <TimeInput
-                                id={`meetings.${index}.startTime`}
-                                value={controllerField.value}
-                                onChange={controllerField.onChange}
-                                aria-invalid={fieldState.invalid}
-                              />
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                              )}
-                            </Field>
-                          )
-                        }}
-                      />
-                      <Controller
-                        name={`meetings.${index}.endTime`}
-                        control={form.control}
-                        render={({ field: controllerField, fieldState }) => {
-                          return (
-                            <Field
-                              data-invalid={fieldState.invalid}
-                              className='flex flex-col gap-2'
-                            >
-                              <div className='flex flex-row gap-2'>
                                 <FieldLabel
-                                  htmlFor={`meetings.${index}.endTime`}
+                                  htmlFor={`meetings.${index}.startTime`}
                                   className='w-min! whitespace-nowrap'
                                 >
-                                  End Time
+                                  Start Time
                                 </FieldLabel>
                                 <TimeInput
-                                  id={`meetings.${index}.endTime`}
+                                  id={`meetings.${index}.startTime`}
                                   value={controllerField.value}
                                   onChange={controllerField.onChange}
+                                  aria-invalid={fieldState.invalid}
                                 />
-                              </div>
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error.hours]} />
-                              )}
-                            </Field>
-                          )
-                        }}
-                      />
+                                {fieldState.invalid && (
+                                  <FieldError errors={[fieldState.error]} />
+                                )}
+                              </Field>
+                            )
+                          }}
+                        />
+                        <Controller
+                          name={`meetings.${index}.endTime`}
+                          control={form.control}
+                          render={({ field: controllerField, fieldState }) => {
+                            return (
+                              <Field
+                                data-invalid={fieldState.invalid}
+                                className='flex flex-col gap-2'
+                              >
+                                <div className='flex flex-row gap-2'>
+                                  <FieldLabel
+                                    htmlFor={`meetings.${index}.endTime`}
+                                    className='w-min! whitespace-nowrap'
+                                  >
+                                    End Time
+                                  </FieldLabel>
+                                  <TimeInput
+                                    id={`meetings.${index}.endTime`}
+                                    value={controllerField.value}
+                                    onChange={controllerField.onChange}
+                                  />
+                                </div>
+                                {fieldState.invalid && (
+                                  <FieldError
+                                    errors={[fieldState.error.hours]}
+                                  />
+                                )}
+                              </Field>
+                            )
+                          }}
+                        />
+                      </div>
+
+                      <div className='flex flex-col gap-2 rounded-md bg-teal-100 p-2'>
+                        <Controller
+                          name={`meetings.${index}.type`}
+                          control={form.control}
+                          render={({ field: controllerField, fieldState }) => {
+                            return (
+                              <Field
+                                data-invalid={fieldState.invalid}
+                                orientation='horizontal'
+                              >
+                                <FieldLabel
+                                  htmlFor={`add-subject_meetings.${index}.type`}
+                                >
+                                  Type
+                                </FieldLabel>
+                                <Input
+                                  {...controllerField}
+                                  id={`add-subject_meetings.${index}.type`}
+                                  placeholder='optional (ex. Lab, Lecture, Online Class)'
+                                  autoComplete='off'
+                                  aria-invalid={fieldState.invalid}
+                                />
+                                {fieldState.invalid && (
+                                  <FieldError errors={[fieldState.error]} />
+                                )}
+                              </Field>
+                            )
+                          }}
+                        />
+
+                        <Controller
+                          name={`meetings.${index}.instructor`}
+                          control={form.control}
+                          render={({ field: controllerField, fieldState }) => {
+                            return (
+                              <Field
+                                data-invalid={fieldState.invalid}
+                                orientation='horizontal'
+                              >
+                                <FieldLabel
+                                  htmlFor={`add-subject_meetings.${index}.instructor`}
+                                >
+                                  Instructor
+                                </FieldLabel>
+                                <Input
+                                  {...controllerField}
+                                  id={`add-subject_meetings.${index}.instructor`}
+                                  placeholder='optional'
+                                  autoComplete='off'
+                                  aria-invalid={fieldState.invalid}
+                                />
+                                {fieldState.invalid && (
+                                  <FieldError errors={[fieldState.error]} />
+                                )}
+                              </Field>
+                            )
+                          }}
+                        />
+
+                        <Controller
+                          name={`meetings.${index}.location`}
+                          control={form.control}
+                          render={({ field: controllerField, fieldState }) => {
+                            return (
+                              <Field
+                                data-invalid={fieldState.invalid}
+                                orientation='horizontal'
+                              >
+                                <FieldLabel
+                                  htmlFor={`add-subject_meetings.${index}.location`}
+                                >
+                                  Location
+                                </FieldLabel>
+                                <Input
+                                  {...controllerField}
+                                  id={`add-subject_meetings.${index}.location`}
+                                  placeholder='optional (ex BUCS B2-201)'
+                                  autoComplete='off'
+                                  aria-invalid={fieldState.invalid}
+                                />
+                                {fieldState.invalid && (
+                                  <FieldError errors={[fieldState.error]} />
+                                )}
+                              </Field>
+                            )
+                          }}
+                        />
+                      </div>
                     </FieldGroup>
                   </FieldSet>
                 )
