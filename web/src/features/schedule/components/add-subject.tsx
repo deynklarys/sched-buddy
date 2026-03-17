@@ -54,6 +54,7 @@ type Time = z.infer<typeof timeSchema>
 
 const addMeetingSchema = z.object({
   instructor: z.string().min(1, 'Meeting instructor is required'),
+  location: z.string().min(1, 'Meeting instructor is required'),
   days: z.array(z.enum(days)).min(1, 'Add at least one day must be selected.'),
   startTime: timeSchema,
   endTime: timeSchema,
@@ -67,6 +68,7 @@ const addSubjectSchema = z.object({
 
 const defaultMeeting: z.infer<typeof addMeetingSchema> = {
   instructor: '',
+  location: '',
   days: [],
   startTime: { hours: 0, minutes: 0, meridiem: 'am' },
   endTime: { hours: 0, minutes: 0, meridiem: 'am' },
@@ -228,6 +230,32 @@ function AddSubject() {
                                 {...controllerField}
                                 id={`add-subject_meetings.${index}.instructor`}
                                 placeholder='Professor X'
+                                autoComplete='off'
+                                aria-invalid={fieldState.invalid}
+                              />
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )
+                        }}
+                      />
+
+                      <Controller
+                        name={`meetings.${index}.location`}
+                        control={form.control}
+                        render={({ field: controllerField, fieldState }) => {
+                          return (
+                            <Field data-invalid={fieldState.invalid}>
+                              <FieldLabel
+                                htmlFor={`add-subject_meetings.${index}.location`}
+                              >
+                                Location
+                              </FieldLabel>
+                              <Input
+                                {...controllerField}
+                                id={`add-subject_meetings.${index}.location`}
+                                placeholder='BUCS B2-201'
                                 autoComplete='off'
                                 aria-invalid={fieldState.invalid}
                               />
