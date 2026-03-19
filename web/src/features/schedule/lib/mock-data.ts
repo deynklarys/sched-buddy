@@ -2,12 +2,12 @@ import { Subject } from '../types'
 
 export const scheduleData: Subject[] = [
   {
-    id: '1',
+    id: crypto.randomUUID(),
     title: 'Data Mining',
     color: '#FFE37D',
     meetings: [
       {
-        id: '1',
+        id: crypto.randomUUID(),
         days: ['monday'],
         startTime: 600,
         endTime: 720,
@@ -15,7 +15,7 @@ export const scheduleData: Subject[] = [
         location: 'BUCS-101',
       },
       {
-        id: '2',
+        id: crypto.randomUUID(),
         days: ['wednesday'],
         startTime: 780,
         endTime: 1140,
@@ -26,83 +26,50 @@ export const scheduleData: Subject[] = [
     ],
   },
   {
-    id: '2',
+    id: crypto.randomUUID(),
     title:
       'Information Assurance and Security Information Assurance and Security',
     color: '#C8F7C5',
     meetings: [
       {
-        id: '3',
+        id: crypto.randomUUID(),
         days: ['tuesday'],
         startTime: 780,
         endTime: 900,
         instructor: 'Brogada, M.',
-        location: 'BUCS-302',
       },
     ],
   },
   {
-    id: '3',
+    id: crypto.randomUUID(),
     title: 'Human Computer Interaction',
     color: '#E08283',
     meetings: [
       {
-        id: '4',
+        id: crypto.randomUUID(),
         days: ['tuesday'],
         startTime: 1020,
         endTime: 1140,
         type: 'Online Class',
         instructor: 'Canon, M.',
-        location: 'BUCS-118',
       },
     ],
   },
   {
-    id: '4',
+    id: crypto.randomUUID(),
     title: 'Networks and Communications',
     color: '#99CCCC',
     meetings: [
       {
-        id: '5',
+        id: crypto.randomUUID(),
         days: ['monday'],
         startTime: 780,
         endTime: 960,
+        type: 'Online Class',
         instructor: 'Brogada, M.',
-        location: 'BUCS-404',
       },
       {
-        id: '5',
-        days: ['tuesday'],
-        startTime: 420,
-        endTime: 540,
-        instructor: 'Brogada, M.',
-        location: 'BUCS-404',
-      },
-    ],
-  },
-  {
-    id: '5',
-    title: 'Science, Technology, and Society',
-    color: '#CC99CC',
-    meetings: [
-      {
-        id: '6',
-        days: ['thursday'],
-        startTime: 540,
-        endTime: 720,
-        type: 'Lecture',
-        instructor: 'Conda-Botin, K.',
-        location: 'BUCS-207',
-      },
-    ],
-  },
-  {
-    id: '6',
-    title: 'Networks and Communiations',
-    color: '#C4DA87',
-    meetings: [
-      {
-        id: '7',
+        id: crypto.randomUUID(),
         days: ['thursday'],
         startTime: 780,
         endTime: 900,
@@ -112,27 +79,43 @@ export const scheduleData: Subject[] = [
     ],
   },
   {
-    id: '7',
-    title: 'Ethics',
-    color: '#F7B891',
+    id: crypto.randomUUID(),
+    title: 'Science, Technology, and Society',
+    color: '#CC99CC',
     meetings: [
       {
-        id: '8',
+        id: crypto.randomUUID(),
         days: ['thursday'],
-        startTime: 1020,
-        endTime: 1200,
-        instructor: 'Orpano, J.',
-        location: 'BUCS-112',
+        startTime: 540,
+        endTime: 720,
+        type: 'Lecture',
+        instructor: 'Conda-Botin, K.',
+        location: 'BUCS B4206',
       },
     ],
   },
   {
-    id: '8',
+    id: crypto.randomUUID(),
+    title: 'Ethics',
+    color: '#F7B891',
+    meetings: [
+      {
+        id: crypto.randomUUID(),
+        days: ['thursday'],
+        startTime: 1020,
+        endTime: 1200,
+        instructor: 'Orpano, J.',
+        location: 'BU Chapel',
+      },
+    ],
+  },
+  {
+    id: crypto.randomUUID(),
     title: 'Software Engineering 2',
     color: '#FFDDFF',
     meetings: [
       {
-        id: '9',
+        id: crypto.randomUUID(),
         days: ['friday'],
         startTime: 540,
         endTime: 720,
@@ -140,10 +123,11 @@ export const scheduleData: Subject[] = [
         location: 'BUCS-401',
       },
       {
-        id: '1a',
+        id: crypto.randomUUID(),
         days: ['friday'],
         startTime: 780,
         endTime: 1140,
+        type: 'Lecture',
         instructor: 'Maceda, L.',
         location: 'BUCS-219',
       },

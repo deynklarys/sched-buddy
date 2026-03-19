@@ -1,5 +1,6 @@
 import {
   Canvas,
+  FabricObject,
   FabricText,
   Group,
   Path,
@@ -391,8 +392,10 @@ export class CanvasEngine {
           /* Apply cell margin */
           const contentWidth = width - style.grid.cell.margin * 2
 
+          const meetingContentObjects: FabricObject[] = []
+
           let topOffset = 0
-          const subjectTitle = new Textbox(subject.title, {
+          const meetingTitle = new Textbox(subject.title, {
             ...baseCellContentStyles,
             width: contentWidth,
             fontSize: style.grid.cell.heading.fontSize,
@@ -400,33 +403,38 @@ export class CanvasEngine {
             top: topOffset,
           })
           topOffset +=
-            subjectTitle.getScaledHeight() +
+            meetingTitle.getScaledHeight() +
             style.grid.cell.heading.marginBottom
+          meetingContentObjects.push(meetingTitle)
 
-          const subjectInstructor = new Textbox(meeting.instructor, {
-            ...baseCellContentStyles,
-            width: contentWidth,
-            fontSize: style.grid.cell.subheading.fontSize,
-            fontWeight: style.grid.cell.subheading.fontWeight,
-            top: topOffset,
-          })
-          topOffset +=
-            subjectInstructor.getScaledHeight() +
-            style.grid.cell.subheading.marginBottom
+          if (meeting.instructor) {
+            const meetingInstructor = new Textbox(meeting.instructor, {
+              ...baseCellContentStyles,
+              width: contentWidth,
+              fontSize: style.grid.cell.subheading.fontSize,
+              fontWeight: style.grid.cell.subheading.fontWeight,
+              top: topOffset,
+            })
+            topOffset +=
+              meetingInstructor.getScaledHeight() +
+              style.grid.cell.subheading.marginBottom
+            meetingContentObjects.push(meetingInstructor)
+          }
 
-          /* SHOULD NOT BE SHOWN WHEN OPTIONAL LABELS ARE NULL */
-          const subjectTypeLabel = meeting.type ? meeting.type : 'no-type'
-          const subjectType = new Textbox(subjectTypeLabel, {
-            ...baseCellContentStyles,
-            width: contentWidth,
-            fontSize: style.grid.cell.body.fontSize,
-            fontWeight: style.grid.cell.body.fontWeight,
-            top: topOffset,
-          })
-          topOffset +=
-            subjectType.getScaledHeight() + style.grid.cell.body.marginBottom
+          if (meeting.type) {
+            const meetingType = new Textbox(meeting.type, {
+              ...baseCellContentStyles,
+              width: contentWidth,
+              fontSize: style.grid.cell.body.fontSize,
+              fontWeight: style.grid.cell.body.fontWeight,
+              top: topOffset,
+            })
+            topOffset +=
+              meetingType.getScaledHeight() + style.grid.cell.body.marginBottom
+            meetingContentObjects.push(meetingType)
+          }
 
-          const subjectTime = new Textbox(
+          const meetingTime = new Textbox(
             `${this._timeGenerateLabel(meeting.startTime, '12')}-${this._timeGenerateLabel(meeting.endTime, '12')}`,
             {
               ...baseCellContentStyles,
@@ -437,37 +445,32 @@ export class CanvasEngine {
             },
           )
           topOffset +=
-            subjectTime.getScaledHeight() + style.grid.cell.body.marginBottom
+            meetingTime.getScaledHeight() + style.grid.cell.body.marginBottom
+          meetingContentObjects.push(meetingTime)
 
-          const subjectLocation = new Textbox(meeting.location, {
-            ...baseCellContentStyles,
-            width: contentWidth,
-            fontSize: style.grid.cell.body.fontSize,
-            fontWeight: style.grid.cell.body.fontWeight,
-            top: topOffset,
+          if (meeting.location) {
+            const meetingLocation = new Textbox(meeting.location, {
+              ...baseCellContentStyles,
+              width: contentWidth,
+              fontSize: style.grid.cell.body.fontSize,
+              fontWeight: style.grid.cell.body.fontWeight,
+              top: topOffset,
+            })
+            topOffset += meetingLocation.getScaledHeight()
+            meetingContentObjects.push(meetingLocation)
+          }
+
+          const meetingContent = new Group(meetingContentObjects, {
+            left: style.grid.cell.margin,
+            fill: '#4287f5',
+            top: height / 2 - topOffset / 2,
+            originX: 'left',
+            originY: 'top',
+            selectable: false,
+            evented: false,
           })
-          topOffset += subjectLocation.getScaledHeight()
 
-          const subjectContent = new Group(
-            [
-              subjectTitle,
-              subjectInstructor,
-              subjectType,
-              subjectTime,
-              subjectLocation,
-            ],
-            {
-              left: style.grid.cell.margin,
-              fill: '#4287f5',
-              top: height / 2 - topOffset / 2,
-              originX: 'left',
-              originY: 'top',
-              selectable: false,
-              evented: false,
-            },
-          )
-
-          const subjectBackground = new Rect({
+          const meetingBackground = new Rect({
             width,
             height,
             fill: subject.color,
@@ -481,7 +484,7 @@ export class CanvasEngine {
             top: 0,
           })
 
-          const subjectGroup = new Group([subjectBackground, subjectContent], {
+          const meetingGroup = new Group([meetingBackground, meetingContent], {
             left,
             top,
             originX: 'left',
@@ -490,21 +493,21 @@ export class CanvasEngine {
             evented: false,
           })
 
-          containerGroup.add(subjectGroup)
+          containerGroup.add(meetingGroup)
 
-          const subjectContentHeight = subjectContent.getScaledHeight()
-          /* Find the subject with the most content */
+          const meetingContentHeight = meetingContent.getScaledHeight()
+          /* Find the meeting with the most content */
           if (
             !meetingWithMaxContent ||
-            subjectContentHeight > meetingWithMaxContent.contentHeight
+            meetingContentHeight > meetingWithMaxContent.contentHeight
           ) {
             meetingWithMaxContent = {
               ...meeting,
-              contentHeight: subjectContentHeight,
+              contentHeight: meetingContentHeight,
               meetingHeight: height,
-              isOverflow: subjectContentHeight > height,
+              isOverflow: meetingContentHeight > height,
               newMeetingHeight:
-                subjectContentHeight + style.grid.cell.margin * 2,
+                meetingContentHeight + style.grid.cell.margin * 2,
             }
           }
         })
