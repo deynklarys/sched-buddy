@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -16,12 +17,15 @@ import { CalendarPlusIcon } from 'lucide-react'
 import SubjectForm, { SubjectFormValue } from './subject-form'
 import { Meeting, Subject } from '../types'
 import { normalizeTime } from '../lib/normalizeTime'
+import { useState } from 'react'
 
 function isStringEmpty(str: unknown): boolean {
   return typeof str !== 'string' || str.trim().length === 0
 }
 
 function AddSubject() {
+  const [open, setOpen] = useState(false)
+
   const { addSubject } = useScheduleActions()
 
   const formId = 'add-subject'
@@ -72,10 +76,13 @@ function AddSubject() {
 
     /* Persist subject */
     addSubject(newSubject)
+
+    /* Programmatically close dialog on success */
+    setOpen(false)
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant='outline'>
           <CalendarPlusIcon /> Add Subject

@@ -49,7 +49,7 @@ const meetingFormSchema = z.object({
   startTime: timeSchema,
   endTime: timeSchema,
 })
-export type Meeting = z.infer<typeof meetingFormSchema>
+export type MeetingFormValue = z.infer<typeof meetingFormSchema>
 
 const subjectFormSchema = z.object({
   title: z.string().min(1, 'Subject title is required'),
@@ -58,7 +58,7 @@ const subjectFormSchema = z.object({
 })
 export type SubjectFormValue = z.infer<typeof subjectFormSchema>
 
-const defaultMeeting: Meeting = {
+const defaultMeeting: MeetingFormValue = {
   type: '',
   instructor: '',
   location: '',
