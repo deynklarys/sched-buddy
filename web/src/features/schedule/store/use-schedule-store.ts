@@ -55,7 +55,23 @@ export const useScheduleStore = create<ScheduleStoreState>()(
             set((state) => ({ subjects: [...state.subjects, subject] }))
           },
           editSubject: (subject) => {
-            console.log('Persisting edit on subject: ', subject)
+            const subjects = get().subjects
+            const subjectToEditIndex = subjects.findIndex(
+              (s) => s.id === subject.id,
+            )
+
+            if (subjectToEditIndex === -1) {
+              throw new Error(
+                'Error persisting edited subject! Subject not found in context.',
+              )
+            }
+
+            /* Create a new copy of the array to not directly modify context using immutable update strategy which is safer for zustand */
+            set({
+              subjects: subjects.map((originalSubject) =>
+                originalSubject.id === subject.id ? subject : originalSubject,
+              ),
+            })
           },
           setDisplay: (display) => set({ display }),
           setOrientation: (orientation) => set({ orientation }),
