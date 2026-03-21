@@ -50,8 +50,9 @@ function EditSubject() {
     /* Persist changes */
     editSubject(newSubject)
 
-    /* Programmatically close dialog on success */
+    /* Programmatically reset on success */
     setOpen(false)
+    setSelectedSubject(null)
   }
 
   function onOpenChange(open: boolean) {
