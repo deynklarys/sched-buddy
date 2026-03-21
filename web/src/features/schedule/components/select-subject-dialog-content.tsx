@@ -10,15 +10,17 @@ import { Subject } from '../types'
 
 export default function SelectSubjectDialogContent({
   onSelect,
+  headerLabel = 'Select a Subject',
 }: {
   onSelect: (subject: Subject) => void
+  headerLabel?: string
 }) {
   const subjects = useScheduleStore((s) => s.subjects)
 
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Select a Subject</DialogTitle>
+        <DialogTitle>{headerLabel}</DialogTitle>
       </DialogHeader>
 
       <div className='max-h-[500px] overflow-y-scroll'>
