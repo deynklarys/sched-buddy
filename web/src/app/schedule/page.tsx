@@ -2,10 +2,10 @@
 
 import Container from '@/components/container'
 import { Button } from '@/components/ui/button'
-import AddSubject from '@/features/schedule/components/add-subject'
-import ChangeDisplay from '@/features/schedule/components/change-display'
-import DeleteSubject from '@/features/schedule/components/delete-subject'
-import EditSubject from '@/features/schedule/components/edit-subject'
+import AddSubject from '@/features/schedule/components/actions/add-subject'
+import ChangeDisplay from '@/features/schedule/components/actions/change-display'
+import DeleteSubject from '@/features/schedule/components/actions/delete-subject'
+import EditSubject from '@/features/schedule/components/actions/edit-subject'
 import { useCanvasEngine } from '@/features/canvas-engine/use-canvas-engine-store'
 import ScheduleView from '@/features/schedule/components/schedule-view'
 import {

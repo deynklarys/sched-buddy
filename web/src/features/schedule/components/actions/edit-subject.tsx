@@ -9,20 +9,20 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { PencilIcon } from 'lucide-react'
-import SubjectForm, { SubjectFormValue } from './subject-form'
+import SubjectForm, { SubjectFormValue } from '../subject-form'
 import { Field } from '@/components/ui/field'
 import { useMemo, useState } from 'react'
 import {
   useScheduleActions,
   useScheduleStore,
-} from '../store/use-schedule-store'
+} from '../../store/use-schedule-store'
 import { TextBody } from '@/components/text'
 import { cn } from '@/lib/utils'
-import { Subject } from '../types'
+import { Subject } from '../../types'
 import {
   subjectFromFormValues,
   subjectToFormValues,
-} from '../lib/subjectMapper'
+} from '../../lib/subjectMapper'
 
 function EditSubject() {
   const [open, setOpen] = useState(false)

@@ -13,9 +13,9 @@ import {
 import { Field } from '@/components/ui/field'
 import { useScheduleActions } from '@/features/schedule/store/use-schedule-store'
 import { CalendarPlusIcon } from 'lucide-react'
-import SubjectForm, { SubjectFormValue } from './subject-form'
+import SubjectForm, { SubjectFormValue } from '../subject-form'
 import { useState } from 'react'
-import { subjectFromFormValues } from '../lib/subjectMapper'
+import { subjectFromFormValues } from '../../lib/subjectMapper'
 
 function AddSubject() {
   const [open, setOpen] = useState(false)
