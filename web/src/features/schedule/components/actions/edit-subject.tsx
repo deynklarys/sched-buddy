@@ -29,35 +29,19 @@ function EditSubject() {
 
   const selectedSubjectFormValues: SubjectFormValue | null = useMemo(() => {
     if (!selectedSubject) return null
-
     return subjectToFormValues(selectedSubject)
   }, [selectedSubject])
 
-  function onSubjectSelect(subject: Subject) {
-    setSelectedSubject(subject)
-  }
-
   function onSubmit(data: SubjectFormValue) {
     if (!selectedSubject) return null
-
     const newSubject = subjectFromFormValues(data, selectedSubject.id)
-
-    /* Persist changes */
     editSubject(newSubject)
-
-    /* Programmatically reset on success */
-    setOpen(false)
     setSelectedSubject(null)
-  }
-
-  function onOpenChange(open: boolean) {
-    setOpen(open)
-    /* On dialog close, clear the selected subject */
-    if (!open) setSelectedSubject(null)
+    setOpen(false)
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant='outline'>
           <PencilIcon /> Edit Subject
@@ -66,7 +50,7 @@ function EditSubject() {
 
       {!selectedSubject && !selectedSubjectFormValues ? (
         <SelectSubjectDialogContent
-          onSelect={onSubjectSelect}
+          onSelect={(s) => setSelectedSubject(s)}
           headerLabel='Select a Subject to Edit'
         />
       ) : (
