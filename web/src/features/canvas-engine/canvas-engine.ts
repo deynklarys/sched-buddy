@@ -1,5 +1,6 @@
 import {
   Canvas,
+  FabricImage,
   FabricObject,
   FabricText,
   Group,
@@ -796,6 +797,21 @@ export class CanvasEngine {
       timetableGroup,
       meetingGroup,
     }
+  }
+
+  async addImage(url: string) {
+    console.log('Image: ', url)
+
+    const img = await FabricImage.fromURL(url)
+    img.set({
+      left: 0,
+      top: 0,
+    })
+
+    img.scaleToWidth(this.CANVAS.width)
+    this.CANVAS.add(img)
+    // this.CANVAS.sendToBack(img)
+    this.CANVAS.renderAll()
   }
 
   export() {
