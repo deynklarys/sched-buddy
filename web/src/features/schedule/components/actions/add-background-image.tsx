@@ -11,14 +11,35 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { ImagePreviewCanvasEngine } from '@/features/canvas-engine/image-preview-canvas-engine'
+import { useCanvasEngine } from '@/features/canvas-engine/use-canvas-engine-store'
 import { cn } from '@/lib/utils'
 import { ComponentClassNameProp } from '@/types'
+import { Group } from 'fabric'
 import { useEffect, useRef, useState } from 'react'
 
 function ImagePreview({ imageUrl }: { imageUrl: string | null }) {
   const canvasContainerRef = useRef<HTMLDivElement | null>(null)
   const canvasElementRef = useRef<HTMLCanvasElement | null>(null)
   const canvasEngineRef = useRef<ImagePreviewCanvasEngine | null>(null)
+  const canvasEngine = useCanvasEngine()
+  const [scheduleContext, setScheduleContext] = useState<{
+    width: number
+    height: number
+    timetableGroup: Group
+  } | null>(null)
+
+  /* Get schedule context */
+  useEffect(() => {
+    const getTimetableGroup = async () => {
+      if (!canvasEngine) return
+      const timetableGroup = await canvasEngine.cloneTimetableGroup()
+      if (!timetableGroup) return
+
+      const dimensions = canvasEngine.getCanvasDimenstions()
+      setScheduleContext({ ...dimensions, timetableGroup })
+    }
+    getTimetableGroup()
+  }, [canvasEngine])
 
   useEffect(() => {
     /* If canvas element is not ready */
@@ -28,17 +49,21 @@ function ImagePreview({ imageUrl }: { imageUrl: string | null }) {
       console.log('ImagePreview rendered but no image available!')
       return
     }
+    if (!scheduleContext) return
 
-    const engine = new ImagePreviewCanvasEngine(canvasElementRef.current)
+    const engine = new ImagePreviewCanvasEngine(
+      canvasElementRef.current,
+      scheduleContext,
+    )
     engine.addImage(imageUrl)
     canvasEngineRef.current = engine
 
     return () => {
-      console.log('Clean up function called')
-      engine.dispose()
+      canvasEngineRef.current?.dispose()
       canvasEngineRef.current = null
+      setScheduleContext(null)
     }
-  }, [imageUrl])
+  }, [imageUrl, scheduleContext])
 
   return (
     <div className='relative size-[500px]'>

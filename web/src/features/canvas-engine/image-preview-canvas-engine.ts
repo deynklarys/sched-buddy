@@ -1,26 +1,30 @@
-import {
-  Canvas,
-  FabricImage,
-  ImageProps,
-  ObjectEvents,
-  Rect,
-  SerializedImageProps,
-} from 'fabric'
+import { Canvas, FabricImage, Group, Rect } from 'fabric'
 
 export class ImagePreviewCanvasEngine {
   private CANVAS: Canvas
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    schedule: {
+      width: number
+      height: number
+      timetableGroup: Group
+    },
+  ) {
+    console.log('Cloned timetable: ', schedule.timetableGroup)
+
     this.CANVAS = new Canvas(canvas, {
       width: 500,
       height: 500,
       backgroundColor: '#ffffff',
     })
+    const CANVAS_WIDTH = this.CANVAS.getWidth()
+    const CANVAS_HEIGHT = this.CANVAS.getHeight()
 
     /* Overlay */
     const bg = new Rect({
-      width: this.CANVAS.getWidth(),
-      height: this.CANVAS.getHeight(),
+      width: CANVAS_WIDTH,
+      height: CANVAS_HEIGHT,
       left: 0,
       top: 0,
       originX: 'left',
@@ -30,10 +34,25 @@ export class ImagePreviewCanvasEngine {
       opacity: 0.5,
       fill: '#E7F3FF',
     })
+
+    const scale = 0.8
+    let cutoutWidth = 200
+    let cutoutHeight = 200
+
+    /* Determine the dimensions of the cutout based on the current schedule's dimensions */
+    const isHeightGreater = schedule.height > schedule.width
+    if (isHeightGreater) {
+      cutoutHeight = CANVAS_HEIGHT * scale
+      cutoutWidth = cutoutHeight * (schedule.width / schedule.height)
+    } else {
+      cutoutWidth = CANVAS_WIDTH * scale
+      cutoutHeight = cutoutWidth * (schedule.height / schedule.width)
+    }
+
     /* Shape to subtract */
     const cutout = new Rect({
-      width: 200,
-      height: 200,
+      width: cutoutWidth,
+      height: cutoutHeight,
       left: bg.getScaledWidth() / 2,
       top: bg.getScaledHeight() / 2,
       originX: 'center',

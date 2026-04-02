@@ -22,6 +22,14 @@ const displays: Display[] = [
     },
   },
   {
+    name: 'iPhone 11 Pro (Landscape)',
+    type: 'phone',
+    dimensions: {
+      width: 2436,
+      height: 1125,
+    },
+  },
+  {
     name: 'iPad Pro 11"',
     type: 'tablet',
     dimensions: {

@@ -1,6 +1,5 @@
 import {
   Canvas,
-  FabricImage,
   FabricObject,
   FabricText,
   Group,
@@ -72,6 +71,7 @@ type MeetingWithContent = Meeting & {
 
 export class CanvasEngine {
   private CANVAS: Canvas
+  private TIMETABLE_GROUP: Group | null = null
 
   private DEFAULT_GRID_WIDTH = 1100
   private DEFAULT_GRID_HEIGHT = 800
@@ -791,6 +791,7 @@ export class CanvasEngine {
       evented: true,
     })
 
+    this.TIMETABLE_GROUP = timetableGroup
     this.CANVAS.add(timetableGroup)
 
     return {
@@ -806,6 +807,19 @@ export class CanvasEngine {
       multiplier: 3,
     })
     return dataUrl
+  }
+
+  async cloneTimetableGroup() {
+    /* Temporary fix! A cleaner solution is to add an id property to FabricObjects and search the canvas to keep it uniform to the codebase */
+    if (!this.TIMETABLE_GROUP) return null
+    return await this.TIMETABLE_GROUP.clone()
+  }
+
+  getCanvasDimenstions() {
+    return {
+      width: this.CANVAS.getWidth(),
+      height: this.CANVAS.getHeight(),
+    }
   }
 
   dispose() {
