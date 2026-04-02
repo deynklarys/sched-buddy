@@ -59,7 +59,7 @@ function ImagePreview({ imageUrl }: { imageUrl: string | null }) {
     canvasEngineRef.current = engine
 
     return () => {
-      canvasEngineRef.current?.dispose()
+      engine.dispose()
       canvasEngineRef.current = null
       setScheduleContext(null)
     }

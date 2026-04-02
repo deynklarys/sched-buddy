@@ -5,13 +5,13 @@ export class ImagePreviewCanvasEngine {
 
   constructor(
     canvas: HTMLCanvasElement,
-    schedule: {
+    scheduleContext: {
       width: number
       height: number
       timetableGroup: Group
     },
   ) {
-    console.log('Cloned timetable: ', schedule.timetableGroup)
+    console.log('Cloned timetable: ', scheduleContext.timetableGroup)
 
     this.CANVAS = new Canvas(canvas, {
       width: 500,
@@ -40,13 +40,15 @@ export class ImagePreviewCanvasEngine {
     let cutoutHeight = 200
 
     /* Determine the dimensions of the cutout based on the current schedule's dimensions */
-    const isHeightGreater = schedule.height > schedule.width
+    const isHeightGreater = scheduleContext.height > scheduleContext.width
     if (isHeightGreater) {
       cutoutHeight = CANVAS_HEIGHT * scale
-      cutoutWidth = cutoutHeight * (schedule.width / schedule.height)
+      cutoutWidth =
+        cutoutHeight * (scheduleContext.width / scheduleContext.height)
     } else {
       cutoutWidth = CANVAS_WIDTH * scale
-      cutoutHeight = cutoutWidth * (schedule.height / schedule.width)
+      cutoutHeight =
+        cutoutWidth * (scheduleContext.height / scheduleContext.width)
     }
 
     /* Shape to subtract */
