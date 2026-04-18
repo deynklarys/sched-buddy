@@ -15,6 +15,11 @@ import {
 } from '../schedule/store/use-schedule-store'
 import { Day, Meeting, Time } from '../schedule/types'
 import { Display } from '../schedule/lib/displays'
+import {
+  ObjectOverride,
+  SetObjectOverride,
+  ViewportState,
+} from './use-canvas-engine-store'
 
 type TimetableStyle = {
   grid: {
@@ -79,12 +84,40 @@ export class CanvasEngine {
   private DEFAULT_START_TIME = 8 * 60
   private DEFAULT_END_TIME = 17 * 60
 
+  private onObjectModified: SetObjectOverride | null = null
+
   constructor(canvas: HTMLCanvasElement) {
     this.CANVAS = new Canvas(canvas, {
       width: this.DEFAULT_GRID_WIDTH,
       height: this.DEFAULT_GRID_HEIGHT,
       backgroundColor: '#ff0000',
     })
+    this.attachListeners()
+  }
+
+  setOnObjectModified(cb: SetObjectOverride) {
+    this.onObjectModified = cb
+  }
+
+  private attachListeners() {
+    this.CANVAS.on('object:modified', (e) => {
+      const obj = e.target as FabricObject
+
+      if (!obj || !obj.id || !this.onObjectModified) return
+
+      this.onObjectModified(obj.id, {
+        left: obj.left,
+        top: obj.top,
+        scaleX: obj.scaleX,
+        scaleY: obj.scaleY,
+        angle: obj.angle,
+      })
+    })
+
+    // this.CANVAS.on('viewport-transform-updated', () => {
+    //   // handled separately via zoom/pan if needed
+    //   console.log('Canvas Viewport updated!')
+    // })
   }
 
   resize(containerWidth: number, containerHeight: number) {
@@ -119,8 +152,10 @@ export class CanvasEngine {
     }
   }
 
-  render(state: ScheduleStoreState) {
+  render(state: ScheduleStoreState, viewport: ViewportState) {
     this.CANVAS.clear()
+
+    console.log('Rendering with VP: ', viewport)
 
     const defaultTimetableStyle: TimetableStyle = {
       grid: {
@@ -177,18 +212,31 @@ export class CanvasEngine {
     this._setCanvasDimension(timetableGroup, state.display)
 
     /* Temporarily scale the timetable to the width of the canvas and center it */
-    timetableGroup.scaleToWidth(
-      this.CANVAS.getWidth() / this.CANVAS.getZoom() + 8,
-    )
-    const zoom = this.CANVAS.getZoom()
-    const vpt = this.CANVAS.viewportTransform
-    const canvasCenterX = (this.CANVAS.getWidth() / 2 - vpt[4]) / zoom
-    const canvasCenterY = (this.CANVAS.getHeight() / 2 - vpt[5]) / zoom
-    timetableGroup.set({ left: canvasCenterX, top: canvasCenterY })
-    timetableGroup.setCoords()
+    // timetableGroup.scaleToWidth(
+    //   this.CANVAS.getWidth() / this.CANVAS.getZoom() + 8,
+    // )
+    // const zoom = this.CANVAS.getZoom()
+    // const vpt = this.CANVAS.viewportTransform
+    // const canvasCenterX = (this.CANVAS.getWidth() / 2 - vpt[4]) / zoom
+    // const canvasCenterY = (this.CANVAS.getHeight() / 2 - vpt[5]) / zoom
+    // // timetableGroup.set({ left: canvasCenterX, top: canvasCenterY })
+    // timetableGroup.set({ left: 100, top: 0 })
+    // timetableGroup.setCoords()
+
+    this._repositionObjects(viewport)
 
     this.CANVAS.backgroundColor = '#ff0000'
     this.CANVAS.requestRenderAll()
+  }
+
+  _repositionObjects(viewport: ViewportState) {
+    this.CANVAS.getObjects().forEach((obj) => {
+      if (!obj.id) return
+
+      const saved = viewport.objectOverrides[obj.id]
+      obj.set({ ...saved })
+      obj.setCoords()
+    })
   }
 
   _getTimetableDays(
@@ -783,6 +831,7 @@ export class CanvasEngine {
     })
 
     const timetableGroup = new Group([timetableBackground, gridGroup], {
+      id: 'timetableGroup',
       originX: 'center',
       originY: 'center',
       left: 0,

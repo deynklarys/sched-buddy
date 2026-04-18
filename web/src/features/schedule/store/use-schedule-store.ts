@@ -85,7 +85,7 @@ export const useScheduleStore = create<ScheduleStoreState>()(
         },
       }) as ScheduleStoreState,
     {
-      name: 'sched-buddy-context',
+      name: 'schedule-context',
       /* Fields to store in localStorage. Don't serialize actions! It cannot be serialized. */
       partialize: (state) => ({
         subjects: state.subjects,
@@ -94,7 +94,7 @@ export const useScheduleStore = create<ScheduleStoreState>()(
         hasHydrated: state.hasHydrated,
       }),
       onRehydrateStorage: () => (state) => {
-        console.log('Context hydrated!')
+        console.log('Schedule Context hydrated!')
         state?.actions.setHasHydrated()
       },
     },
