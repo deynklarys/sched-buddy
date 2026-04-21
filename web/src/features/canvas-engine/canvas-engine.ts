@@ -15,11 +15,7 @@ import {
 } from '../schedule/store/use-schedule-store'
 import { Day, Meeting, Time } from '../schedule/types'
 import { Display } from '../schedule/lib/displays'
-import {
-  ObjectOverride,
-  SetObjectOverride,
-  ViewportState,
-} from './use-canvas-engine-store'
+import { SetObjectOverride, ViewportState } from './use-canvas-engine-store'
 
 type TimetableStyle = {
   grid: {
@@ -76,10 +72,14 @@ type MeetingWithContent = Meeting & {
 
 export class CanvasEngine {
   private CANVAS: Canvas
+
   private TIMETABLE_GROUP: Group | null = null
 
   private DEFAULT_GRID_WIDTH = 1100
   private DEFAULT_GRID_HEIGHT = 800
+
+  private LOGICAL_CANVAS_WIDTH: number = this.DEFAULT_GRID_WIDTH
+  private LOGICAL_CANVAS_HEIGHT: number = this.DEFAULT_GRID_HEIGHT
 
   private DEFAULT_START_TIME = 8 * 60
   private DEFAULT_END_TIME = 17 * 60
@@ -103,6 +103,7 @@ export class CanvasEngine {
     this.CANVAS.on('object:modified', (e) => {
       const obj = e.target as FabricObject
 
+      /* Only objects with ids are saved */
       if (!obj || !obj.id || !this.onObjectModified) return
 
       this.onObjectModified(obj.id, {
@@ -113,41 +114,29 @@ export class CanvasEngine {
         angle: obj.angle,
       })
     })
-
-    // this.CANVAS.on('viewport-transform-updated', () => {
-    //   // handled separately via zoom/pan if needed
-    //   console.log('Canvas Viewport updated!')
-    // })
   }
 
   resize(containerWidth: number, containerHeight: number) {
     /* Resize logic source: https://jsfiddle.net/robsch/g8x9mjvt/ */
     if (!this.CANVAS) return
     /* Determine whether to go with width-first or height-first scaling.
-    Whichever prevents an overflow. */
+       Whichever prevents an overflow. */
     /* Try height-first scaling, and see if the width overflows the container */
     const tempScale = containerHeight / this.CANVAS.getHeight()
     const tempScaledWidth = this.CANVAS.getWidth() * tempScale
+
     /* If it doesn't overflow, stick with height-first scaling, else go with width-first. */
     if (tempScaledWidth < containerWidth) {
       /* Height-first scaling */
-      const ratio = this.CANVAS.getHeight() / this.CANVAS.getWidth()
-      const scale = containerHeight / this.CANVAS.getHeight()
-      const zoom = this.CANVAS.getZoom() * scale
-      this.CANVAS.setDimensions({
-        width: containerHeight / ratio,
-        height: containerHeight,
-      })
+      const zoom = containerHeight / this.LOGICAL_CANVAS_HEIGHT
+      const scaledWidth = this.LOGICAL_CANVAS_WIDTH * zoom
+      this.CANVAS.setDimensions({ height: containerHeight, width: scaledWidth })
       this.CANVAS.setViewportTransform([zoom, 0, 0, zoom, 0, 0])
     } else {
       /* Width-first scaling */
-      const ratio = this.CANVAS.getWidth() / this.CANVAS.getHeight()
-      const scale = containerWidth / this.CANVAS.getWidth()
-      const zoom = this.CANVAS.getZoom() * scale
-      this.CANVAS.setDimensions({
-        width: containerWidth,
-        height: containerWidth / ratio,
-      })
+      const zoom = containerWidth / this.LOGICAL_CANVAS_WIDTH
+      const scaledHeight = this.LOGICAL_CANVAS_HEIGHT * zoom
+      this.CANVAS.setDimensions({ width: containerWidth, height: scaledHeight })
       this.CANVAS.setViewportTransform([zoom, 0, 0, zoom, 0, 0])
     }
   }
@@ -155,7 +144,7 @@ export class CanvasEngine {
   render(state: ScheduleStoreState, viewport: ViewportState) {
     this.CANVAS.clear()
 
-    console.log('Rendering with VP: ', viewport)
+    console.log('Rendering with zoom: ', this.CANVAS.getZoom())
 
     const defaultTimetableStyle: TimetableStyle = {
       grid: {
@@ -232,7 +221,6 @@ export class CanvasEngine {
   _repositionObjects(viewport: ViewportState) {
     this.CANVAS.getObjects().forEach((obj) => {
       if (!obj.id) return
-
       const saved = viewport.objectOverrides[obj.id]
       obj.set({ ...saved })
       obj.setCoords()
@@ -621,9 +609,14 @@ export class CanvasEngine {
       })
       timetableGroup.set({ selectable: false, evented: false })
     } else {
+      const width = display.dimensions.width
+      const height = display.dimensions.height
+
+      this.LOGICAL_CANVAS_WIDTH = width
+      this.LOGICAL_CANVAS_HEIGHT = height
       this.CANVAS.setDimensions({
-        width: display.dimensions.width,
-        height: display.dimensions.height,
+        width: width,
+        height: height,
       })
       timetableGroup.set({ selectable: true, evented: true })
     }
@@ -832,8 +825,10 @@ export class CanvasEngine {
 
     const timetableGroup = new Group([timetableBackground, gridGroup], {
       id: 'timetableGroup',
-      originX: 'center',
-      originY: 'center',
+      // originX: 'center',
+      originX: 'left',
+      // originY: 'center',
+      originY: 'top',
       left: 0,
       top: 0,
       selectable: true,

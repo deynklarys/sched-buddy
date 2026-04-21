@@ -65,20 +65,25 @@ export default function ScheduleView() {
   }, [statesHydrated, setEngine])
 
   /* Rerender the canvas when the states changes */
-  useEffect(() => {
-    if (
-      !statesHydrated ||
-      !canvasElementRef.current ||
-      !canvasEngine ||
-      !canvasContainerRef.current
-    ) {
-      return
-    }
+  useEffect(
+    () => {
+      if (
+        !statesHydrated ||
+        !canvasElementRef.current ||
+        !canvasEngine ||
+        !canvasContainerRef.current
+      ) {
+        return
+      }
 
-    const { clientWidth, clientHeight } = canvasContainerRef.current
-    canvasEngine.render(scheduleState, canvasViewportState)
-    canvasEngine.resize(clientWidth, clientHeight)
-  }, [statesHydrated, scheduleState, canvasEngine])
+      const { clientWidth, clientHeight } = canvasContainerRef.current
+      canvasEngine.render(scheduleState, canvasViewportState)
+      canvasEngine.resize(clientWidth, clientHeight)
+    },
+    /* Don't include canvasViewportState in the dependency array. This is an inteded behaviour.
+     canvasViewportState changes on every FabricJS object:modified event! */
+    [statesHydrated, scheduleState, canvasEngine],
+  )
 
   /* Attach the resize listener */
   useEffect(() => {
