@@ -225,7 +225,12 @@ export class CanvasEngine {
       if (saved === undefined) {
         /* Make timetableGroup span the whole width */
         if (obj.id === this.TIMETABLE_GROUP_ID) {
-          obj.scaleToWidth(this.LOGICAL_CANVAS_WIDTH)
+          if (this.LOGICAL_CANVAS_WIDTH <= this.LOGICAL_CANVAS_HEIGHT) {
+            obj.scaleToWidth(this.LOGICAL_CANVAS_WIDTH)
+          } else {
+            /* Some vertical padding so timetable doesnt touch vertical edges */
+            obj.scaleToHeight(this.LOGICAL_CANVAS_HEIGHT - 100)
+          }
         }
 
         /* Centered in the canvas */
