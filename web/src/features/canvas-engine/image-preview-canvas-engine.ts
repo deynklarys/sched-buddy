@@ -1,4 +1,4 @@
-import { Canvas, FabricImage, Group, Rect } from 'fabric'
+import { Canvas, FabricImage, Group, Point, Rect } from 'fabric'
 
 export class ImagePreviewCanvasEngine {
   private CANVAS: Canvas
@@ -19,8 +19,8 @@ export class ImagePreviewCanvasEngine {
     const CANVAS_WIDTH = this.CANVAS.getWidth()
     const CANVAS_HEIGHT = this.CANVAS.getHeight()
 
-    /* Overlay */
-    const bg = new Rect({
+    /* See-through Overlay */
+    const overlay = new Rect({
       width: CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
       left: 0,
@@ -29,7 +29,7 @@ export class ImagePreviewCanvasEngine {
       originY: 'top',
       selectable: false,
       evented: false,
-      opacity: 0.5,
+      // opacity: 0.5,
       fill: '#E7F3FF',
     })
 
@@ -48,58 +48,83 @@ export class ImagePreviewCanvasEngine {
       cutoutHeight =
         cutoutWidth * (scheduleContext.height / scheduleContext.width)
     }
-    const scheduleRelativeLeft = (CANVAS_WIDTH - cutoutWidth) / 2
-    const scheduleRelativeTop = (CANVAS_HEIGHT - cutoutHeight) / 2
 
     /* Shape to subtract */
     const cutout = new Rect({
       width: cutoutWidth,
       height: cutoutHeight,
-      left: bg.getScaledWidth() / 2,
-      top: bg.getScaledHeight() / 2,
+      left: overlay.getScaledWidth() / 2,
+      top: overlay.getScaledHeight() / 2,
       originX: 'center',
       originY: 'center',
       inverted: true,
       absolutePositioned: true,
     })
+    overlay.clipPath = cutout
 
-    bg.clipPath = cutout
-    this.CANVAS.add(bg)
+    const srcCanvasLogicalWidth = scheduleContext.width
+    const srcCanvasLogicalHeight = scheduleContext.height
+    const originalTimetableGroupLeft = scheduleContext.timetableGroup.left
+    const originalTimetableGroupTop = scheduleContext.timetableGroup.top
 
-    const left = scheduleContext.timetableGroup.left
-    const top = scheduleContext.timetableGroup.top
-    console.log(scheduleContext.timetableGroup)
-    console.log(
-      `sW: ${scheduleContext.width}, sH: ${scheduleContext.height} | l: ${left}, t: ${top}`,
-    )
+    /* Mimic the canvas */
 
-    const timetableNewLeft = scheduleRelativeLeft
-    const timetableNewTop = scheduleRelativeTop
-    const scheduleScale = cutoutWidth / scheduleContext.width
-    console.log(
-      `scheduleScale = ${cutoutWidth} / ${scheduleContext.width} = ${scheduleScale}`,
-    )
-
-    console.log(
-      `${timetableNewLeft} + (${scheduleContext.timetableGroup.left} * ${scheduleScale}) =`,
-      timetableNewLeft + scheduleContext.timetableGroup.left * scheduleScale,
-    )
-
-    scheduleContext.timetableGroup.scaleToWidth(cutoutWidth)
-
-    // scheduleContext.timetableGroup.scaleX = scheduleScale
-    // scheduleContext.timetableGroup.scaleY = scheduleScale
-
-    scheduleContext.timetableGroup.set({
-      left: timetableNewLeft,
-      // left:
-      // timetableNewLeft + scheduleContext.timetableGroup.left * scheduleScale,
-      top: timetableNewTop,
-      // originX: 'center',
-      // originY: 'center',
+    /* Rect to span the group to the canvas dimension */
+    const srcCanvasPlaceholder = new Rect({
+      width: srcCanvasLogicalWidth,
+      height: srcCanvasLogicalHeight,
+      /* Group object has its own internal coordinate system where (0,0) is at the center.
+         So offset the background such that its at the top left of the group */
+      left: -srcCanvasLogicalWidth / 2,
+      top: -srcCanvasLogicalHeight / 2,
+      originX: 'left',
+      originY: 'top',
+      fill: '#ff0000',
+      absolutePositioned: false,
     })
 
-    this.CANVAS.add(scheduleContext.timetableGroup)
+    /* Insert the cloned timetableGroup */
+    scheduleContext.timetableGroup.set({
+      /* - originalTimetableGroupLeft & originalTimetableGroupLeft 
+         originates from the canvas's top left
+         - group's origin (0,0) is at the center */
+      left: originalTimetableGroupLeft - srcCanvasLogicalWidth / 2,
+      top: originalTimetableGroupTop - srcCanvasLogicalHeight / 2,
+    })
+
+    const scheduleGroup = new Group(
+      [srcCanvasPlaceholder, scheduleContext.timetableGroup],
+      {
+        clipPath: srcCanvasPlaceholder,
+        // selectable: false,
+        // evented: false,
+      },
+    )
+    // scheduleGroup.set({
+    //   width: scheduleContext.width,
+    //   height: scheduleContext.height,
+    //   left: 0,
+    //   top: 0,
+    // })
+    scheduleGroup.setCoords()
+
+    console.log(
+      srcCanvasPlaceholder.getScaledWidth() / scheduleGroup.getScaledWidth(),
+    )
+
+    scheduleGroup.scaleToWidth(cutoutWidth)
+    // scheduleGroup.scaleToWidth(
+    //   cutoutWidth +
+    //     (scheduleGroup.getScaledWidth() -
+    //       srcCanvasPlaceholder.getScaledWidth()),
+    // )
+
+    const center = new Point(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2)
+    overlay.setXY(center, 'center', 'center')
+    scheduleGroup.setXY(center, 'center', 'center')
+
+    this.CANVAS.add(overlay)
+    this.CANVAS.add(scheduleGroup)
 
     this.CANVAS.renderAll()
   }

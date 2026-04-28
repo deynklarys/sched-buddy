@@ -55,7 +55,7 @@ function ImagePreview({ imageUrl }: { imageUrl: string | null }) {
       canvasElementRef.current,
       scheduleContext,
     )
-    engine.addImage(imageUrl)
+    // engine.addImage(imageUrl)
     canvasEngineRef.current = engine
 
     return () => {

@@ -883,8 +883,8 @@ export class CanvasEngine {
 
   getCanvasDimenstions() {
     return {
-      width: this.CANVAS.getWidth(),
-      height: this.CANVAS.getHeight(),
+      width: this.LOGICAL_CANVAS_WIDTH,
+      height: this.LOGICAL_CANVAS_HEIGHT,
     }
   }
 
