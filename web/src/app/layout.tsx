@@ -1,7 +1,13 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
-import { Inter, Nunito } from 'next/font/google'
+import { Inter, Nunito, Reddit_Sans } from 'next/font/google'
 import Navigation from '@/features/navigation/components'
+
+const redditSans = Reddit_Sans({
+  variable: '--font-reddit',
+  weight: 'variable',
+  subsets: ['latin'],
+})
 
 const nunito = Nunito({
   variable: '--font-nunito',
@@ -28,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body
-        className={`${nunito.variable} ${inter.variable} light relative flex min-h-screen flex-col antialiased`}
+        className={`${nunito.variable} ${inter.variable} ${redditSans.variable} light relative flex min-h-screen flex-col antialiased`}
       >
         <header className='sticky top-0 z-999'>
           <Navigation />

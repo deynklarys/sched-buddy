@@ -10,7 +10,7 @@ export default function HomePage() {
         <div className='flex flex-col items-center justify-center gap-12'>
           <div className='flex flex-col items-center gap-4'>
             <TextDisplay className='text-center'>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit
+              Smart Schedules, Zero Confusion rddit
             </TextDisplay>
             <TextBody>
               Ut enim ad minim veniam, quis nostrud exercitation!

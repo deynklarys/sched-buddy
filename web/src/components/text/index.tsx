@@ -6,7 +6,7 @@ Minor Third is used
 */
 
 export const textDisplayClassNames =
-  'font-heading text-foreground text-[47.28px] leading-[110%] font-[850] tracking-[-0.2px]'
+  'font-heading text-foreground text-[64px] leading-[110%] font-[700] tracking-[-0.5px]'
 export const TextDisplay = ({
   className,
   children,
@@ -21,7 +21,7 @@ export const TextDisplay = ({
 }
 
 export const textHeadingClassNames =
-  'font-heading text-foreground text-[27.36px] leading-[128%] font-[750] tracking-[-0.5px]'
+  'font-heading text-foreground text-[28px] leading-[130%] font-[600] tracking-[-0.2px]'
 export const TextHeading = ({
   className,
   children,
@@ -36,7 +36,7 @@ export const TextHeading = ({
 }
 
 export const textBodyClassNames =
-  'font-body text-foreground text-[18px] leading-[140%] font-[400] tracking-[-0.27px]'
+  'font-body text-foreground text-[18px] leading-[160%] font-[400] tracking-[-0.0px]'
 export const TextBody = ({
   className,
   children,
@@ -51,7 +51,7 @@ export const TextBody = ({
 }
 
 export const textSubClassNames =
-  'font-body text-foreground text-[12px] leading-[120%] font-[350] tracking-[0.2]'
+  'font-body text-foreground text-[13px] leading-[140%] font-[500] tracking-[0.1px]'
 export const TextSub = ({
   className,
   children,
