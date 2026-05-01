@@ -3,7 +3,7 @@ import { TextBody, TextDisplay, TextHeading } from '@/components/text'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-export default function HomePage() {
+export default function DesignPage() {
   return (
     <div className='grid h-screen w-screen place-items-center'>
       <WidthContainer>

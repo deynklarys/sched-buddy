@@ -1,11 +1,11 @@
-import Container from '@/components/container'
+import WidthContainer from '@/components/container'
 import { TextHeading, TextSub } from '@/components/text'
 import Link from 'next/link'
 
 export default function Navigation() {
   return (
     <nav className='border-border bg-background border-b-2 border-dashed py-8'>
-      <Container>
+      <WidthContainer>
         <div className='flex flex-row items-center justify-between'>
           <Link href='/'>
             <div className='flex flex-row items-center gap-1'>
@@ -20,7 +20,7 @@ export default function Navigation() {
             <TextSub>Link 3</TextSub>
           </div>
         </div>
-      </Container>
+      </WidthContainer>
     </nav>
   )
 }

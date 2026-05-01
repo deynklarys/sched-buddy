@@ -47,18 +47,36 @@
 }
 
 :root {
-  /* Modified Shadcn */
-  --background: #f5f5dd;
-  --foreground: #496580;
-  --card: #f5f5dd;
-  --card-foreground: #496580;
-  --popover: #f5f5dd;
-  --popover-foreground: #496580;
+  /* Primitives */
+  --brand-red: #d00000;
+  --brand-orange: #fb8500;
+  --brand-yellow: #ffd60a;
+  --brand-green: #70e000;
+  --brand-blue: #219ebc;
+  --brand-pink: #fe689b;
+  --base-100: #ffffff;
+  --base-200: #fbfaf9;
+  --base-300: #474645;
+  --base-400: #171717;
+  --base-500: #121212;
+  --base-600: #000000;
 
-  --muted: #cac4bd;
-  --muted-foreground: #4a6580;
-  --border: #89cff0;
-  --destructive: #b04b4b;
+  /* Modified Shadcn */
+  --background: var(--base-100);
+  --foreground: var(--base-400);
+  --card: var(--base-100);
+  --card-foreground: var(--base-400);
+  --popover: var(--base-100);
+  --popover-foreground: var(--base-400);
+
+  --muted: var(--base-200);
+  --muted-foreground: var(--base-300);
+
+  --border: var(--base-300);
+  --destructive: #var(--brand-red);
+
+  --input: var(--brand-green);
+  --ring: var(--brand-yellow);
 
   /* Default Shadcn */
   --radius: 0.625rem;
@@ -70,8 +88,7 @@
 
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);

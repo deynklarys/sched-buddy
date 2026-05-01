@@ -11,11 +11,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          'bg-foreground hover:bg-foreground/90 text-background hover:bg-foreground/90',
+        // default:
+        //   'bg-foreground hover:bg-foreground/90 text-background hover:bg-foreground/90',
+        outline2:
+          'bg-background hover:bg-background/90 border border-x-2 border-t-2 border-b-5 border-border text-foreground hover:bg-muted/20',
         outline:
           'bg-background hover:bg-background/90 border border-x-2 border-t-2 border-b-5 border-muted text-foreground hover:bg-muted/20',
-        ghost: 'bg-transparent border border-transparent hover:border-border',
+        // ghost: 'bg-transparent border border-transparent hover:border-border',
       },
       size: {
         default: 'px-8 py-3',
@@ -23,7 +25,7 @@ const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'outline',
       size: 'default',
     },
   },

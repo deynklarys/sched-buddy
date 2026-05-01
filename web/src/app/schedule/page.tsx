@@ -1,6 +1,6 @@
 'use client'
 
-import Container from '@/components/container'
+import WidthContainer from '@/components/container'
 import { Button } from '@/components/ui/button'
 import AddSubject from '@/features/schedule/components/actions/add-subject'
 import ChangeDisplay from '@/features/schedule/components/actions/change-display'
@@ -38,7 +38,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <Container className='mt-16 mb-8 flex grow md:max-w-[1440px]'>
+    <WidthContainer className='mt-16 mb-8 flex grow md:max-w-[1440px]'>
       <div className='flex grow flex-col gap-4 md:flex-row'>
         <div className='flex flex-col gap-4'>
           <Button variant='outline'>
@@ -81,6 +81,6 @@ export default function SchedulePage() {
           <ScheduleView />
         </div>
       </div>
-    </Container>
+    </WidthContainer>
   )
 }
