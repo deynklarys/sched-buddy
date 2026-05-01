@@ -8,6 +8,8 @@ import {
   TextSub,
 } from '@/components/text'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import AddSubject from '@/features/schedule/components/actions/add-subject'
 import { Plus } from 'lucide-react'
 
 function Hero() {
@@ -126,6 +128,36 @@ function ButtonShowcase() {
   )
 }
 
+function InputShowcase() {
+  return (
+    <div className='flex w-full flex-col items-center gap-8 rounded border-b py-16'>
+      <TextHeadingLG>Inputs</TextHeadingLG>
+      <div className='flex flex-col gap-2'>
+        <TextBody>Default</TextBody>
+        <Input placeholder='johndoee@gmail.com' />
+      </div>
+      <div className='flex flex-col gap-2'>
+        <TextBody className='text-destructive'>Error</TextBody>
+        <Input aria-invalid={true} placeholder='johndoee@gmail.com' />
+        <TextSub className='text-destructive'>Error message</TextSub>
+      </div>
+      <div className='flex flex-col gap-2'>
+        <TextBody>Disable</TextBody>
+        <Input disabled={true} placeholder='johndoee@gmail.com' />
+      </div>
+    </div>
+  )
+}
+
+function SubjectFormShowcase() {
+  return (
+    <div className='flex w-full flex-col items-center gap-8 rounded border-b py-16'>
+      <TextHeadingLG>Subject Form Dialog</TextHeadingLG>
+      <AddSubject />
+    </div>
+  )
+}
+
 export default function DesignPage() {
   return (
     <div className='mb-[200px] flex min-h-screen w-screen flex-col'>
@@ -134,6 +166,8 @@ export default function DesignPage() {
         <Typescale />
         <TyposcaleShowcase />
         <ButtonShowcase />
+        <InputShowcase />
+        <SubjectFormShowcase />
       </WidthContainer>
     </div>
   )
