@@ -7,6 +7,8 @@ import {
   TextHeadingSM,
   TextSub,
 } from '@/components/text'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
 
 function Hero() {
   return (
@@ -36,7 +38,7 @@ function Typescale() {
   )
 }
 
-function TyposcaleUsage() {
+function TyposcaleShowcase() {
   return (
     <div className='flex flex-col gap-16 border-b py-16'>
       <div className='flex flex-col items-center gap-8'>
@@ -50,13 +52,9 @@ function TyposcaleUsage() {
             with all React frameworks. Open Source. Free forever.
           </TextHeadingSM>
         </div>
-        <div className='flex gap-8'>
-          <div className='bg-foreground rounded-md px-4 py-2'>
-            <TextBody className='text-background'>Browse Blocks</TextBody>
-          </div>
-          <div className='rounded-md border px-4 py-2'>
-            <TextBody>View Components</TextBody>
-          </div>
+        <div className='flex gap-4'>
+          <Button>Browse Blocks</Button>
+          <Button variant='outline'>View Components</Button>
         </div>
       </div>
       <div className='flex flex-col items-center gap-8'>
@@ -102,13 +100,40 @@ function TyposcaleUsage() {
   )
 }
 
+function ButtonShowcase() {
+  const variants = ['default', 'outline'] as const
+
+  return (
+    <div className='flex w-full flex-col items-center gap-8 rounded border-b py-16'>
+      <TextHeadingLG>Button Variants</TextHeadingLG>
+      {variants.map((variant, index) => {
+        return (
+          <div key={index} className='flex flex-row items-center gap-8'>
+            <TextHeadingSM>{variant}:</TextHeadingSM>
+            <div className='flex flex-row gap-4'>
+              <Button variant={variant}>
+                <Plus /> Button
+              </Button>
+              <Button variant={variant}>Button</Button>
+              <Button variant={variant} size='icon'>
+                <Plus />
+              </Button>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function DesignPage() {
   return (
     <div className='mb-[200px] flex min-h-screen w-screen flex-col'>
       <Hero />
       <WidthContainer className='flex flex-col'>
         <Typescale />
-        <TyposcaleUsage />
+        <TyposcaleShowcase />
+        <ButtonShowcase />
       </WidthContainer>
     </div>
   )

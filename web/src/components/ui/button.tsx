@@ -7,25 +7,22 @@ import { textBodyClassNames } from '../text'
 
 /* focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive */
 const buttonVariants = cva(
-  "[&_svg:not([class*='size-'])]:size-6 inline-flex items-center justify-center gap-2 rounded-xl whitespace-nowrap outline-none [&_svg]:shrink-0 disabled:pointer-events-none disabled:opacity-50 shrink-0 [&_svg]:pointer-events-none transition-all",
+  "[&_svg:not([class*='size-'])]:size-5 inline-flex items-center justify-center gap-1 rounded-full whitespace-nowrap outline-none [&_svg]:shrink-0 disabled:pointer-events-none disabled:opacity-50 shrink-0 [&_svg]:pointer-events-none transition-all hover:scale-[102%]",
   {
     variants: {
       variant: {
-        // default:
-        //   'bg-foreground hover:bg-foreground/90 text-background hover:bg-foreground/90',
         default:
-          'bg-background hover:bg-background/90 border border-x-2 border-t-2 border-b-5 border-border text-foreground hover:bg-muted/20',
+          'bg-foreground border-x-2 border-t-2 border-b-5 border-border text-background',
         outline:
-          'bg-background hover:bg-background/90 border border-x-2 border-t-2 border-b-5 border-muted text-foreground hover:bg-muted/20',
-        // ghost: 'bg-transparent border border-transparent hover:border-border',
+          'bg-background  border-x-2 border-t-2 border-b-5 border-border text-foreground',
       },
       size: {
-        default: 'px-8 py-3',
+        default: 'px-4 py-2',
         icon: 'p-2 size-fit rounded-full',
       },
     },
     defaultVariants: {
-      variant: 'outline',
+      variant: 'default',
       size: 'default',
     },
   },
@@ -48,7 +45,6 @@ function Button({
       data-slot='button'
       className={cn(
         textBodyClassNames,
-        'font-heading font-[850] tracking-[0.3px]',
         buttonVariants({ variant, size, className }),
         'focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive focus-visible:ring-[3px]',
       )}
