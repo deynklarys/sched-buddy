@@ -1,3 +1,5 @@
+'use client'
+
 import WidthContainer from '@/components/container'
 import {
   TextBody,
@@ -7,10 +9,12 @@ import {
   TextHeadingSM,
   TextSub,
 } from '@/components/text'
+import { TimePicker } from '@/components/time-picker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import AddSubject from '@/features/schedule/components/actions/add-subject'
 import { Plus } from 'lucide-react'
+import { useState } from 'react'
 
 function Hero() {
   return (
@@ -129,21 +133,38 @@ function ButtonShowcase() {
 }
 
 function InputShowcase() {
+  const [date, setDate] = useState<Date | undefined>(new Date())
+
+  const setDateWrapper = (date: Date | undefined) => {
+    console.log(date)
+    setDate(date)
+  }
+
   return (
     <div className='flex w-full flex-col items-center gap-8 rounded border-b py-16'>
       <TextHeadingLG>Inputs</TextHeadingLG>
-      <div className='flex flex-col gap-2'>
-        <TextBody>Default</TextBody>
-        <Input placeholder='johndoee@gmail.com' />
-      </div>
-      <div className='flex flex-col gap-2'>
-        <TextBody className='text-destructive'>Error</TextBody>
-        <Input aria-invalid={true} placeholder='johndoee@gmail.com' />
-        <TextSub className='text-destructive'>Error message</TextSub>
-      </div>
-      <div className='flex flex-col gap-2'>
-        <TextBody>Disable</TextBody>
-        <Input disabled={true} placeholder='johndoee@gmail.com' />
+      <div className='flex flex-row gap-8'>
+        <div className='flex flex-col items-center gap-4'>
+          <TextHeadingMD>Input</TextHeadingMD>
+          <div className='flex flex-col gap-2'>
+            <TextBody>Default</TextBody>
+            <Input placeholder='johndoee@gmail.com' />
+          </div>
+          <div className='flex flex-col gap-2'>
+            <TextBody className='text-destructive'>Error</TextBody>
+            <Input aria-invalid={true} placeholder='johndoee@gmail.com' />
+            <TextSub className='text-destructive'>Error message</TextSub>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <TextBody>Disable</TextBody>
+            <Input disabled={true} placeholder='johndoee@gmail.com' />
+          </div>
+        </div>
+        <div className='flex flex-col items-center gap-4'>
+          <TextHeadingMD>Time</TextHeadingMD>
+          <TimePicker date={date} setDate={setDateWrapper} />
+          <TimePicker date={date} setDate={setDateWrapper} />
+        </div>
       </div>
     </div>
   )

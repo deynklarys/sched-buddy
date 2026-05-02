@@ -22,16 +22,17 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
       type={type}
       data-slot='input'
       className={cn(
-        textBodyClassNames,
-        'w-full min-w-0 rounded-xl px-3.5 py-2',
-        'border-input border',
-        'placeholder:text-border text-foreground bg-background outline-none',
         transitionClasses,
         selectionClasses,
         disabledClasses,
         focusClasses,
         errorClasses,
         fileClasses,
+        textBodyClassNames,
+        'w-full min-w-0 rounded-xl px-3.5 py-2',
+        'border-input border',
+        'placeholder:text-border text-foreground-100 bg-background outline-none',
+
         className,
       )}
       {...props}
