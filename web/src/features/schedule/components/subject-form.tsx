@@ -1,15 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-  FieldTitle,
-} from '@/components/ui/field'
+import { Field, FieldContent, FieldError, FieldGroup, FieldLabel, FieldSet, FieldTitle } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { XIcon } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -24,15 +16,7 @@ import { useEffect, useState } from 'react'
 import { Day } from '../types'
 import { ComponentClassNameProp } from '@/types'
 
-const days: Day[] = [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday',
-]
+const days: Day[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
 const timeSchema = z.object({
   hours: z.number().min(1, 'minimum hour is 1').max(12, 'max hour is 12'),
@@ -103,14 +87,8 @@ function SubjectForm({
                 control={form.control}
                 render={({ field, fieldState }) => {
                   return (
-                    <Field
-                      data-invalid={fieldState.invalid}
-                      orientation='vertical'
-                    >
-                      <FieldLabel
-                        htmlFor='subject-form_title'
-                        className='whitespace-nowrap'
-                      >
+                    <Field data-invalid={fieldState.invalid} orientation='vertical'>
+                      <FieldLabel htmlFor='subject-form_title' className='whitespace-nowrap'>
                         Subject Title
                       </FieldLabel>
 
@@ -121,9 +99,7 @@ function SubjectForm({
                         autoComplete='off'
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )
                 }}
@@ -133,14 +109,8 @@ function SubjectForm({
                 control={form.control}
                 render={({ field, fieldState }) => {
                   return (
-                    <Field
-                      data-invalid={fieldState.invalid}
-                      orientation='vertical'
-                    >
-                      <FieldLabel
-                        htmlFor='subject-form_color'
-                        className='whitespace-nowrap'
-                      >
+                    <Field data-invalid={fieldState.invalid} orientation='vertical'>
+                      <FieldLabel htmlFor='subject-form_color' className='whitespace-nowrap'>
                         Color
                       </FieldLabel>
 
@@ -151,9 +121,7 @@ function SubjectForm({
                         autoComplete='off'
                         aria-invalid={fieldState.invalid}
                       />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )
                 }}
@@ -166,10 +134,7 @@ function SubjectForm({
         <div className='flex flex-col gap-8'>
           {meetings.map((field, index) => {
             return (
-              <FieldSet
-                key={field.id}
-                className='bg-background w-full overflow-hidden rounded-xl border'
-              >
+              <FieldSet key={field.id} className='bg-background w-full overflow-hidden rounded-xl border'>
                 <div className='flex items-center justify-between border-b px-6 py-4'>
                   <TextHeadingSM>Meeting {index + 1}</TextHeadingSM>
                   {meetings.length > 1 && (
@@ -192,10 +157,7 @@ function SubjectForm({
                       render={({ field: controllerField, fieldState }) => {
                         return (
                           <div className='flex flex-col gap-2'>
-                            <FieldGroup
-                              data-slot='checkbox-group'
-                              className='flex flex-row justify-center !gap-6'
-                            >
+                            <FieldGroup data-slot='checkbox-group' className='flex flex-row justify-center !gap-6'>
                               {days.map((day) => {
                                 return (
                                   <Field
@@ -220,15 +182,11 @@ function SubjectForm({
                                       name={controllerField.name}
                                       id={`subject-form_meetings.${index}.day.${day}`}
                                       className='hidden'
-                                      checked={controllerField.value.includes(
-                                        day,
-                                      )}
+                                      checked={controllerField.value.includes(day)}
                                       onCheckedChange={(checked) => {
                                         const newValues = checked
                                           ? [...controllerField.value, day]
-                                          : controllerField.value.filter(
-                                              (value) => value !== day,
-                                            )
+                                          : controllerField.value.filter((value) => value !== day)
                                         controllerField.onChange(newValues)
                                       }}
                                     />
@@ -266,9 +224,7 @@ function SubjectForm({
                                 )
                               })}
                             </FieldGroup>
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                           </div>
                         )
                       }}
@@ -340,15 +296,8 @@ function SubjectForm({
                       control={form.control}
                       render={({ field: controllerField, fieldState }) => {
                         return (
-                          <Field
-                            data-invalid={fieldState.invalid}
-                            orientation='vertical'
-                          >
-                            <FieldLabel
-                              htmlFor={`subject-form_meetings.${index}.type`}
-                            >
-                              Type
-                            </FieldLabel>
+                          <Field data-invalid={fieldState.invalid} orientation='vertical'>
+                            <FieldLabel htmlFor={`subject-form_meetings.${index}.type`}>Type</FieldLabel>
                             <Input
                               {...controllerField}
                               id={`subject-form_meetings.${index}.type`}
@@ -356,9 +305,7 @@ function SubjectForm({
                               autoComplete='off'
                               aria-invalid={fieldState.invalid}
                             />
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                           </Field>
                         )
                       }}
@@ -369,15 +316,8 @@ function SubjectForm({
                       control={form.control}
                       render={({ field: controllerField, fieldState }) => {
                         return (
-                          <Field
-                            data-invalid={fieldState.invalid}
-                            orientation='vertical'
-                          >
-                            <FieldLabel
-                              htmlFor={`subject-form_meetings.${index}.instructor`}
-                            >
-                              Instructor
-                            </FieldLabel>
+                          <Field data-invalid={fieldState.invalid} orientation='vertical'>
+                            <FieldLabel htmlFor={`subject-form_meetings.${index}.instructor`}>Instructor</FieldLabel>
                             <Input
                               {...controllerField}
                               id={`subject-form_meetings.${index}.instructor`}
@@ -385,9 +325,7 @@ function SubjectForm({
                               autoComplete='off'
                               aria-invalid={fieldState.invalid}
                             />
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                           </Field>
                         )
                       }}
@@ -398,15 +336,8 @@ function SubjectForm({
                       control={form.control}
                       render={({ field: controllerField, fieldState }) => {
                         return (
-                          <Field
-                            data-invalid={fieldState.invalid}
-                            orientation='vertical'
-                          >
-                            <FieldLabel
-                              htmlFor={`subject-form_meetings.${index}.location`}
-                            >
-                              Location
-                            </FieldLabel>
+                          <Field data-invalid={fieldState.invalid} orientation='vertical'>
+                            <FieldLabel htmlFor={`subject-form_meetings.${index}.location`}>Location</FieldLabel>
                             <Input
                               {...controllerField}
                               id={`subject-form_meetings.${index}.location`}
@@ -414,9 +345,7 @@ function SubjectForm({
                               autoComplete='off'
                               aria-invalid={fieldState.invalid}
                             />
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                           </Field>
                         )
                       }}
@@ -529,11 +458,7 @@ function TimeInput({
                 <FieldContent>
                   <FieldTitle>{meridiem.toUpperCase()}</FieldTitle>
                 </FieldContent>
-                <RadioGroupItem
-                  value={meridiem}
-                  id={`${id}.${meridiem}`}
-                  className='hidden'
-                />
+                <RadioGroupItem value={meridiem} id={`${id}.${meridiem}`} className='hidden' />
               </Field>
             </FieldLabel>
           )

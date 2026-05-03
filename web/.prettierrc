@@ -9,6 +9,6 @@
   "objectWrap": "preserve",
   "bracketSameLine": false,
   "proseWrap": "always",
-  "printWidth": 80,
+  "printWidth": 100,
   "plugins": ["prettier-plugin-tailwindcss"]
 }
