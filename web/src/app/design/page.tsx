@@ -10,6 +10,7 @@ import {
   TextSub,
 } from '@/components/text'
 import { TimePicker } from '@/components/time-picker'
+import { TimePickerNew } from '@/components/time-picker-new'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import AddSubject from '@/features/schedule/components/actions/add-subject'
@@ -133,11 +134,27 @@ function ButtonShowcase() {
 }
 
 function InputShowcase() {
-  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [date, setDate] = useState<Date | undefined>(undefined)
 
   const setDateWrapper = (date: Date | undefined) => {
     console.log(date)
     setDate(date)
+  }
+
+  type Time = {
+    hours: number | undefined
+    minutes: number | undefined
+    meridiem: 'AM' | 'PM'
+  }
+  const [time, setTime] = useState<Time>({
+    hours: undefined,
+    minutes: undefined,
+    meridiem: 'AM',
+  })
+
+  const onTimeChange = (time: Time) => {
+    console.log('Setting time to: ', time)
+    setTime(time)
   }
 
   return (
@@ -164,6 +181,15 @@ function InputShowcase() {
           <TextHeadingMD>Time</TextHeadingMD>
           <TimePicker date={date} setDate={setDateWrapper} />
           <TimePicker date={date} setDate={setDateWrapper} />
+        </div>
+        <div className='flex flex-col items-center gap-4'>
+          <TextHeadingMD>Time New</TextHeadingMD>
+          <TimePickerNew value={time} onChange={onTimeChange} />
+          <TimePickerNew
+            aria-invalid={true}
+            value={time}
+            onChange={onTimeChange}
+          />
         </div>
       </div>
     </div>
