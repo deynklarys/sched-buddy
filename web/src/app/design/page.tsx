@@ -10,7 +10,6 @@ import {
   TextSub,
 } from '@/components/text'
 import { TimePicker } from '@/components/time-picker'
-import { TimePickerNew } from '@/components/time-picker-new'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import AddSubject from '@/features/schedule/components/actions/add-subject'
@@ -177,15 +176,11 @@ function InputShowcase() {
             <Input disabled={true} placeholder='johndoee@gmail.com' />
           </div>
         </div>
+
         <div className='flex flex-col items-center gap-4'>
           <TextHeadingMD>Time</TextHeadingMD>
-          <TimePicker date={date} setDate={setDateWrapper} />
-          <TimePicker date={date} setDate={setDateWrapper} />
-        </div>
-        <div className='flex flex-col items-center gap-4'>
-          <TextHeadingMD>Time New</TextHeadingMD>
-          <TimePickerNew value={time} onChange={onTimeChange} />
-          <TimePickerNew
+          <TimePicker value={time} onChange={onTimeChange} />
+          <TimePicker
             aria-invalid={true}
             value={time}
             onChange={onTimeChange}

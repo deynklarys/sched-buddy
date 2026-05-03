@@ -6,17 +6,50 @@ import { TimePickerInput } from './time-picker-input'
 import { TimeMeridiemSelect } from './meridiem-select'
 import { Meridiem } from './utils'
 
-interface TimePickerProps {
-  date: Date | undefined
-  setDate: (date: Date | undefined) => void
+type Time = {
+  hours: number | undefined
+  minutes: number | undefined
+  meridiem: Meridiem
 }
 
-export function TimePicker({ date, setDate }: TimePickerProps) {
-  const [meridiem, setMeridiem] = React.useState<Meridiem>('PM')
+interface TimePickerProps {
+  value: Time
+  onChange: (time: Time) => void
+  'aria-invalid'?: boolean
+}
 
+export function TimePicker({
+  value,
+  onChange,
+  'aria-invalid': ariaInvalid,
+}: TimePickerProps) {
   const minuteRef = React.useRef<HTMLInputElement>(null)
   const hourRef = React.useRef<HTMLInputElement>(null)
   const periodRef = React.useRef<HTMLButtonElement>(null)
+
+  const handleHourChange = (hours: string) => {
+    onChange({
+      hours: parseInt(hours, 10),
+      minutes: value.minutes,
+      meridiem: value.meridiem,
+    })
+  }
+
+  const handleMinuteChange = (minutes: string) => {
+    onChange({
+      hours: value.hours,
+      minutes: parseInt(minutes, 10),
+      meridiem: value.meridiem,
+    })
+  }
+
+  const handleMeridiemChange = (meridiem: Meridiem) => {
+    onChange({
+      hours: value.hours,
+      minutes: value.minutes,
+      meridiem,
+    })
+  }
 
   return (
     <div className='flex items-end gap-2 *:flex *:flex-col *:items-center *:gap-1 *:text-center'>
@@ -25,9 +58,13 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
         <TimePickerInput
           id='hours'
           picker='12hours'
-          meridiem={meridiem}
-          date={date}
-          setDate={setDate}
+          value={
+            value.hours !== undefined
+              ? String(value.hours).padStart(2, '0')
+              : ''
+          }
+          placeholder='12'
+          onChange={handleHourChange}
           ref={hourRef}
           onRightFocus={() => minuteRef.current?.focus()}
         />
@@ -35,10 +72,15 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
       <div>
         <Label htmlFor='minutes'>Minutes</Label>
         <TimePickerInput
-          picker='minutes'
           id='minutes'
-          date={date}
-          setDate={setDate}
+          picker='minutes'
+          value={
+            value.minutes !== undefined
+              ? String(value.minutes).padStart(2, '0')
+              : ''
+          }
+          placeholder='00'
+          onChange={handleMinuteChange}
           ref={minuteRef}
           onLeftFocus={() => hourRef.current?.focus()}
           onRightFocus={() => periodRef.current?.focus()}
@@ -48,10 +90,8 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
         <Label htmlFor='meridiem'>Period</Label>
         <TimeMeridiemSelect
           id='meridiem'
-          meridiem={meridiem}
-          setMeridiem={setMeridiem}
-          date={date}
-          setDate={setDate}
+          meridiem={value.meridiem}
+          onChange={handleMeridiemChange}
           ref={periodRef}
           onLeftFocus={() => minuteRef.current?.focus()}
         />
