@@ -34,17 +34,18 @@ function AddSubject() {
         instructor: '',
         location: '',
         days: [],
-        startTime: { hours: 0, minutes: 0, meridiem: 'am' },
-        endTime: { hours: 0, minutes: 0, meridiem: 'am' },
+        startTime: { hours: undefined, minutes: undefined, meridiem: 'AM' },
+        endTime: { hours: undefined, minutes: undefined, meridiem: 'AM' },
       },
     ],
   }
 
   function onSubmit(data: SubjectFormValue) {
-    const newSubject = subjectFromFormValues(data)
+    console.log(data)
+    // const newSubject = subjectFromFormValues(data)
 
     /* Persist subject */
-    addSubject(newSubject)
+    // addSubject(newSubject)
 
     /* Programmatically close dialog on success */
     setOpen(false)
@@ -64,11 +65,7 @@ function AddSubject() {
           <DialogDescription>Adds a subject to the timetable</DialogDescription>
         </DialogHeader>
 
-        <SubjectForm
-          formId={formId}
-          defaultValues={defaultValues}
-          onSubmit={onSubmit}
-        />
+        <SubjectForm formId={formId} defaultValues={defaultValues} onSubmit={onSubmit} />
 
         <DialogFooter>
           <DialogClose asChild>

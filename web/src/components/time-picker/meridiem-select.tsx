@@ -8,46 +8,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Meridiem, display12HourValue, setDateByType } from './utils'
+import { Meridiem } from './utils'
 
-export interface MeridiemSelectProps {
+export type MeridiemSelectProps = {
   id?: string
-  meridiem: Meridiem
+  value: Meridiem
   onChange: (meridiem: Meridiem) => void
   onRightFocus?: () => void
   onLeftFocus?: () => void
+  'aria-invalid'?: boolean
 }
 
-export const TimeMeridiemSelect = React.forwardRef<
-  HTMLButtonElement,
-  MeridiemSelectProps
->(({ id, meridiem, onChange, onLeftFocus, onRightFocus }, ref) => {
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (e.key === 'ArrowRight') onRightFocus?.()
-    if (e.key === 'ArrowLeft') onLeftFocus?.()
-  }
+export const TimeMeridiemSelect = React.forwardRef<HTMLButtonElement, MeridiemSelectProps>(
+  ({ id, value, onChange, onLeftFocus, onRightFocus, 'aria-invalid': ariaInvalid }, ref) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (e.key === 'ArrowRight') onRightFocus?.()
+      if (e.key === 'ArrowLeft') onLeftFocus?.()
+    }
 
-  return (
-    <div className='flex h-10 items-center'>
-      <Select
-        value={meridiem}
-        onValueChange={(value: Meridiem) => onChange(value)}
-      >
-        <SelectTrigger
-          id={id}
-          ref={ref}
-          className='w-[80px]'
-          onKeyDown={handleKeyDown}
-        >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent position='popper'>
-          <SelectItem value='AM'>AM</SelectItem>
-          <SelectItem value='PM'>PM</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  )
-})
+    return (
+      <div className='flex h-10 items-center'>
+        <Select value={value} onValueChange={(value: Meridiem) => onChange(value)}>
+          <SelectTrigger
+            aria-invalid={ariaInvalid}
+            id={id}
+            ref={ref}
+            className='w-[75px]'
+            onKeyDown={handleKeyDown}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent position='popper' className='z-[99999]'>
+            <SelectItem value='AM'>AM</SelectItem>
+            <SelectItem value='PM'>PM</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    )
+  },
+)
 
 TimeMeridiemSelect.displayName = 'TimeMeridiemSelect'

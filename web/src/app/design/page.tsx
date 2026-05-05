@@ -54,8 +54,8 @@ function TyposcaleShowcase() {
         <div className='flex flex-col gap-8 *:text-center'>
           <TextDisplay>Building Blocks for the Web</TextDisplay>
           <TextHeadingSM className='max-w-[600px]'>
-            Clean, modern building blocks. Copy and paste into your apps. Works
-            with all React frameworks. Open Source. Free forever.
+            Clean, modern building blocks. Copy and paste into your apps. Works with all React
+            frameworks. Open Source. Free forever.
           </TextHeadingSM>
         </div>
         <div className='flex gap-4'>
@@ -71,33 +71,31 @@ function TyposcaleShowcase() {
           <div className='flex w-[450px] flex-col gap-2'>
             <TextHeadingMD>Send & Receive</TextHeadingMD>
             <TextBody>
-              Flawless essentials. Easily send tokens and collectibles with the
-              fewest taps, or share your wallet address by simply scanning a
-              personalized QR code to receive new assets.
+              Flawless essentials. Easily send tokens and collectibles with the fewest taps, or
+              share your wallet address by simply scanning a personalized QR code to receive new
+              assets.
             </TextBody>
           </div>
           <div className='flex w-[450px] flex-col gap-2'>
             <TextHeadingMD>Decentralized Swaps</TextHeadingMD>
             <TextBody>
-              Trade thousands of tokens with minimal fees, 24/7. Family ensures
-              optimal prices from various exchanges so you can acquire the
-              tokens you want, whenever you want them.
+              Trade thousands of tokens with minimal fees, 24/7. Family ensures optimal prices from
+              various exchanges so you can acquire the tokens you want, whenever you want them.
             </TextBody>
           </div>
           <div className='flex w-[450px] flex-col gap-2'>
             <TextHeadingMD>Send & Receive</TextHeadingMD>
             <TextBody>
-              Flawless essentials. Easily send tokens and collectibles with the
-              fewest taps, or share your wallet address by simply scanning a
-              personalized QR code to receive new assets.
+              Flawless essentials. Easily send tokens and collectibles with the fewest taps, or
+              share your wallet address by simply scanning a personalized QR code to receive new
+              assets.
             </TextBody>
           </div>
           <div className='flex w-[450px] flex-col gap-2'>
             <TextHeadingMD>Decentralized Swaps</TextHeadingMD>
             <TextBody>
-              Trade thousands of tokens with minimal fees, 24/7. Family ensures
-              optimal prices from various exchanges so you can acquire the
-              tokens you want, whenever you want them.
+              Trade thousands of tokens with minimal fees, 24/7. Family ensures optimal prices from
+              various exchanges so you can acquire the tokens you want, whenever you want them.
             </TextBody>
           </div>
         </div>
@@ -152,7 +150,6 @@ function InputShowcase() {
   })
 
   const onTimeChange = (time: Time) => {
-    console.log('Setting time to: ', time)
     setTime(time)
   }
 
@@ -180,11 +177,7 @@ function InputShowcase() {
         <div className='flex flex-col items-center gap-4'>
           <TextHeadingMD>Time</TextHeadingMD>
           <TimePicker value={time} onChange={onTimeChange} />
-          <TimePicker
-            aria-invalid={true}
-            value={time}
-            onChange={onTimeChange}
-          />
+          <TimePicker aria-invalid={true} value={time} onChange={onTimeChange} />
         </div>
       </div>
     </div>

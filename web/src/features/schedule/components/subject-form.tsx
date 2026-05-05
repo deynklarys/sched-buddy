@@ -1,7 +1,15 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Field, FieldContent, FieldError, FieldGroup, FieldLabel, FieldSet, FieldTitle } from '@/components/ui/field'
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+  FieldTitle,
+} from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { XIcon } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -15,21 +23,56 @@ import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import { Day } from '../types'
 import { ComponentClassNameProp } from '@/types'
+import { TimePicker } from '@/components/time-picker'
 
 const days: Day[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
-const timeSchema = z.object({
-  hours: z.number().min(1, 'minimum hour is 1').max(12, 'max hour is 12'),
-  minutes: z.number().min(0, 'minimum minute is 0').max(59, 'max minute is 59'),
-  meridiem: z.enum(['am', 'pm'], 'Choose a meridiem'),
-})
+/* Verify hours and minutes on form submit! */
+const timeSchema = z
+  .object({
+    hours: z.union([
+      z.number().min(1, 'minimum hour is 1').max(12, 'max hour is 12'),
+      z.undefined(),
+    ]),
+    minutes: z.union([
+      z.number().min(0, 'minimum minute is 0').max(59, 'max minute is 59'),
+      z.undefined(),
+    ]),
+    meridiem: z.enum(['AM', 'PM'], 'Choose a meridiem'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.hours === undefined && data.minutes === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Time is required',
+        path: [],
+      })
+    }
+
+    if (data.hours === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Hours is required',
+        path: [],
+      })
+    }
+
+    if (data.minutes === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Minutes is required',
+        path: [],
+      })
+    }
+  })
+
 type Time = z.infer<typeof timeSchema>
 
 const meetingFormSchema = z.object({
   type: z.string(),
   instructor: z.string(),
   location: z.string(),
-  days: z.array(z.enum(days)).min(1, 'At least one day must be selected.'),
+  days: z.array(z.enum(days)).min(1, 'Select at least one day'),
   startTime: timeSchema,
   endTime: timeSchema,
 })
@@ -42,13 +85,13 @@ const subjectFormSchema = z.object({
 })
 export type SubjectFormValue = z.infer<typeof subjectFormSchema>
 
-const defaultMeeting: MeetingFormValue = {
+const emptyMeeting: MeetingFormValue = {
   type: '',
   instructor: '',
   location: '',
   days: [],
-  startTime: { hours: 0, minutes: 0, meridiem: 'am' },
-  endTime: { hours: 0, minutes: 0, meridiem: 'am' },
+  startTime: { hours: undefined, minutes: undefined, meridiem: 'AM' },
+  endTime: { hours: undefined, minutes: undefined, meridiem: 'AM' },
 }
 
 function SubjectForm({
@@ -134,7 +177,10 @@ function SubjectForm({
         <div className='flex flex-col gap-8'>
           {meetings.map((field, index) => {
             return (
-              <FieldSet key={field.id} className='bg-background w-full overflow-hidden rounded-xl border'>
+              <FieldSet
+                key={field.id}
+                className='bg-background w-full overflow-hidden rounded-xl border'
+              >
                 <div className='flex items-center justify-between border-b px-6 py-4'>
                   <TextHeadingSM>Meeting {index + 1}</TextHeadingSM>
                   {meetings.length > 1 && (
@@ -157,7 +203,10 @@ function SubjectForm({
                       render={({ field: controllerField, fieldState }) => {
                         return (
                           <div className='flex flex-col gap-2'>
-                            <FieldGroup data-slot='checkbox-group' className='flex flex-row justify-center !gap-6'>
+                            <FieldGroup
+                              data-slot='checkbox-group'
+                              className='flex flex-row justify-center !gap-6'
+                            >
                               {days.map((day) => {
                                 return (
                                   <Field
@@ -230,34 +279,35 @@ function SubjectForm({
                       }}
                     />
 
-                    {/* <Controller
+                    <Controller
                       name={`meetings.${index}.startTime`}
                       control={form.control}
                       render={({ field: controllerField, fieldState }) => {
                         return (
                           <Field
                             data-invalid={fieldState.invalid}
-                            className='flex flex-row gap-2'
+                            className='flex flex-col items-center gap-2 *:text-center'
                           >
-                            <FieldLabel
-                              htmlFor={`meetings.${index}.startTime`}
-                              className='w-min! whitespace-nowrap'
-                            >
-                              Start Time
-                            </FieldLabel>
-                            <TimeInput
-                              id={`meetings.${index}.startTime`}
-                              value={controllerField.value}
-                              onChange={controllerField.onChange}
-                              aria-invalid={fieldState.invalid}
-                            />
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
+                            <div className='flex flex-row justify-center gap-2'>
+                              <FieldLabel
+                                htmlFor={`meetings.${index}.startTime`}
+                                className='w-min! whitespace-nowrap'
+                              >
+                                Start Time
+                              </FieldLabel>
+                              <TimePicker
+                                id={`meetings.${index}.startTime`}
+                                value={controllerField.value}
+                                onChange={controllerField.onChange}
+                                aria-invalid={fieldState.invalid}
+                              />
+                            </div>
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                           </Field>
                         )
                       }}
                     />
+
                     <Controller
                       name={`meetings.${index}.endTime`}
                       control={form.control}
@@ -265,29 +315,27 @@ function SubjectForm({
                         return (
                           <Field
                             data-invalid={fieldState.invalid}
-                            className='flex flex-col gap-2'
+                            className='flex flex-col items-center gap-2 *:text-center'
                           >
-                            <div className='flex flex-row gap-2'>
+                            <div className='flex flex-row justify-center gap-2'>
                               <FieldLabel
                                 htmlFor={`meetings.${index}.endTime`}
                                 className='w-min! whitespace-nowrap'
                               >
                                 End Time
                               </FieldLabel>
-                              <TimeInput
+                              <TimePicker
                                 id={`meetings.${index}.endTime`}
                                 value={controllerField.value}
                                 onChange={controllerField.onChange}
+                                aria-invalid={fieldState.invalid}
                               />
                             </div>
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error.hours]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                           </Field>
                         )
                       }}
-                    /> */}
-                    <div className='h-[100px] w-full' />
+                    />
                   </div>
 
                   <div className='flex flex-row gap-4 p-6'>
@@ -297,7 +345,9 @@ function SubjectForm({
                       render={({ field: controllerField, fieldState }) => {
                         return (
                           <Field data-invalid={fieldState.invalid} orientation='vertical'>
-                            <FieldLabel htmlFor={`subject-form_meetings.${index}.type`}>Type</FieldLabel>
+                            <FieldLabel htmlFor={`subject-form_meetings.${index}.type`}>
+                              Type
+                            </FieldLabel>
                             <Input
                               {...controllerField}
                               id={`subject-form_meetings.${index}.type`}
@@ -317,7 +367,9 @@ function SubjectForm({
                       render={({ field: controllerField, fieldState }) => {
                         return (
                           <Field data-invalid={fieldState.invalid} orientation='vertical'>
-                            <FieldLabel htmlFor={`subject-form_meetings.${index}.instructor`}>Instructor</FieldLabel>
+                            <FieldLabel htmlFor={`subject-form_meetings.${index}.instructor`}>
+                              Instructor
+                            </FieldLabel>
                             <Input
                               {...controllerField}
                               id={`subject-form_meetings.${index}.instructor`}
@@ -337,7 +389,9 @@ function SubjectForm({
                       render={({ field: controllerField, fieldState }) => {
                         return (
                           <Field data-invalid={fieldState.invalid} orientation='vertical'>
-                            <FieldLabel htmlFor={`subject-form_meetings.${index}.location`}>Location</FieldLabel>
+                            <FieldLabel htmlFor={`subject-form_meetings.${index}.location`}>
+                              Location
+                            </FieldLabel>
                             <Input
                               {...controllerField}
                               id={`subject-form_meetings.${index}.location`}
@@ -359,7 +413,7 @@ function SubjectForm({
         <Button
           type='button'
           variant='outline'
-          onClick={() => appendMeeting(defaultMeeting)}
+          onClick={() => appendMeeting(emptyMeeting)}
           /* To limit a number of meetings */
           // disabled={meetings.length >= 5}
         >
@@ -416,7 +470,7 @@ function TimeInput({
     onChange(newTime)
   }
 
-  const meridiems: Time['meridiem'][] = ['am', 'pm']
+  const meridiems: Time['meridiem'][] = ['AM', 'PM']
 
   return (
     <div className={cn('flex flex-row gap-4', className)}>

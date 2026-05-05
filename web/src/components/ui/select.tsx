@@ -7,21 +7,15 @@ import { Select as SelectPrimitive } from 'radix-ui'
 import { cn } from '@/lib/utils'
 import { textBodyClassNames } from '../text'
 
-function Select({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) {
+function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot='select' {...props} />
 }
 
-function SelectGroup({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Group>) {
+function SelectGroup({ ...props }: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return <SelectPrimitive.Group data-slot='select-group' {...props} />
 }
 
-function SelectValue({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Value>) {
+function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value data-slot='select-value' {...props} />
 }
 
@@ -56,7 +50,7 @@ function SelectTrigger({
         transitionClasses,
         disabledClasses,
         textBodyClassNames,
-        'border-input dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-xl border bg-transparent px-3.5 py-2 whitespace-nowrap shadow-xs outline-none',
+        'border-input dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-1 rounded-xl border bg-transparent px-3.5 py-2 whitespace-nowrap shadow-xs outline-none',
         className,
       )}
       {...props}
@@ -113,10 +107,7 @@ function SelectContent({
   )
 }
 
-function SelectLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Label>) {
+function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
     <SelectPrimitive.Label
       data-slot='select-label'
@@ -131,8 +122,7 @@ function SelectItem({
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Item>) {
-  const dataClasses =
-    'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+  const dataClasses = 'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
   const childrenClasses =
     "[&_svg:not([class*='text-'])]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2"
   const focusClasses = 'focus:bg-muted'
@@ -183,10 +173,7 @@ function SelectScrollUpButton({
   return (
     <SelectPrimitive.ScrollUpButton
       data-slot='select-scroll-up-button'
-      className={cn(
-        'flex cursor-default items-center justify-center py-1',
-        className,
-      )}
+      className={cn('flex cursor-default items-center justify-center py-1', className)}
       {...props}
     >
       <ChevronUpIcon className='size-4' />
@@ -201,10 +188,7 @@ function SelectScrollDownButton({
   return (
     <SelectPrimitive.ScrollDownButton
       data-slot='select-scroll-down-button'
-      className={cn(
-        'flex cursor-default items-center justify-center py-1',
-        className,
-      )}
+      className={cn('flex cursor-default items-center justify-center py-1', className)}
       {...props}
     >
       <ChevronDownIcon className='size-4' />

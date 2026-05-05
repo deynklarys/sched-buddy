@@ -9,20 +9,18 @@ import {
   getValidHour,
   getValidMinuteOrSecond,
 } from './utils'
+import { ComponentClassNameProp } from '@/types'
 
-export interface TimePickerInputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+export type TimePickerInputProps = {
   picker: TimePickerType
   value: string
   placeholder?: string
   onChange: (value: string) => void
   onRightFocus?: () => void
   onLeftFocus?: () => void
-}
-const TimePickerInput = React.forwardRef<
-  HTMLInputElement,
-  TimePickerInputProps
->(
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>
+
+const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>(
   (
     {
       className,
@@ -59,8 +57,7 @@ const TimePickerInput = React.forwardRef<
 
     const calculateNewValue = (key: string) => {
       if (picker === '12hours') {
-        if (flag && value.slice(1, 2) === '1' && prevIntKey === '0')
-          return '0' + key
+        if (flag && value.slice(1, 2) === '1' && prevIntKey === '0') return '0' + key
       }
       return !flag ? '0' + key : value.slice(1, 2) + key
     }
@@ -112,6 +109,7 @@ const TimePickerInput = React.forwardRef<
 
     return (
       <Input
+        aria-invalid={true}
         ref={ref}
         id={id || picker}
         name={name || picker}
