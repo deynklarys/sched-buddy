@@ -61,7 +61,7 @@ function EditSubject() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Subject</DialogTitle>
-            <DialogDescription></DialogDescription>
+            <DialogDescription>Update the subject details</DialogDescription>
           </DialogHeader>
 
           <SubjectForm
