@@ -11,13 +11,10 @@ import {
 import { PencilIcon } from 'lucide-react'
 import SubjectForm, { SubjectFormValue } from '../subject-form'
 import { Field } from '@/components/ui/field'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useScheduleActions } from '../../store/use-schedule-store'
 import { Subject } from '../../types'
-import {
-  subjectFromFormValues,
-  subjectToFormValues,
-} from '../../lib/subjectMapper'
+import { subjectFromFormValues, subjectToFormValues } from '../../lib/subjectMapper'
 import SelectSubjectDialogContent from '../select-subject-dialog-content'
 
 function EditSubject() {
@@ -40,8 +37,15 @@ function EditSubject() {
     setOpen(false)
   }
 
+  function onChangeOpen(open: boolean) {
+    if (!open) {
+      setSelectedSubject(null)
+    }
+    setOpen(open)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onChangeOpen}>
       <DialogTrigger asChild>
         <Button variant='outline'>
           <PencilIcon /> Edit Subject
