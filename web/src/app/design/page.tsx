@@ -1,5 +1,6 @@
 'use client'
 
+import ColorPicker from '@/components/color-picker'
 import WidthContainer from '@/components/container'
 import {
   TextBody,
@@ -131,13 +132,6 @@ function ButtonShowcase() {
 }
 
 function InputShowcase() {
-  const [date, setDate] = useState<Date | undefined>(undefined)
-
-  const setDateWrapper = (date: Date | undefined) => {
-    console.log(date)
-    setDate(date)
-  }
-
   type Time = {
     hours: number | undefined
     minutes: number | undefined
@@ -148,10 +142,11 @@ function InputShowcase() {
     minutes: undefined,
     meridiem: 'AM',
   })
-
   const onTimeChange = (time: Time) => {
     setTime(time)
   }
+
+  const [hex, setHex] = useState('#dd0000')
 
   return (
     <div className='flex w-full flex-col items-center gap-8 rounded border-b py-16'>
@@ -178,6 +173,11 @@ function InputShowcase() {
           <TextHeadingMD>Time</TextHeadingMD>
           <TimePicker value={time} onChange={onTimeChange} />
           <TimePicker aria-invalid={true} value={time} onChange={onTimeChange} />
+        </div>
+
+        <div className='flex flex-col items-center gap-4'>
+          <TextHeadingMD>Color</TextHeadingMD>
+          <ColorPicker hex={hex} onHexChange={setHex} />
         </div>
       </div>
     </div>

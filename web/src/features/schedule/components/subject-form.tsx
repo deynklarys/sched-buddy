@@ -1,29 +1,21 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-  FieldTitle,
-} from '@/components/ui/field'
+import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { XIcon } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import formatDay from '../lib/format-day'
-import { TextBody, TextHeadingSM } from '@/components/text'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { TextHeadingSM } from '@/components/text'
 import z from 'zod'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
-import { useEffect, useState } from 'react'
 import { Day } from '../types'
-import { ComponentClassNameProp } from '@/types'
 import { TimePicker } from '@/components/time-picker'
+import ColorPicker from '@/components/color-picker'
+import { ComponentClassNameProp } from '@/types'
+import { useRef } from 'react'
 
 const days: Day[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
@@ -94,15 +86,22 @@ const emptyMeeting: MeetingFormValue = {
   endTime: { hours: undefined, minutes: undefined, meridiem: 'AM' },
 }
 
+const emptySubject = {
+  title: '',
+  color: '#FB8500',
+  meetings: [emptyMeeting],
+}
+
 function SubjectForm({
   formId,
-  defaultValues,
+  defaultValues = emptySubject,
   onSubmit,
+  className,
 }: {
   formId: string
-  defaultValues: SubjectFormValue
+  defaultValues?: SubjectFormValue
   onSubmit: (data: SubjectFormValue) => void
-}) {
+} & ComponentClassNameProp) {
   const form = useForm<SubjectFormValue>({
     resolver: zodResolver(subjectFormSchema),
     mode: 'onSubmit',
@@ -120,7 +119,12 @@ function SubjectForm({
 
   return (
     <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-      <FieldGroup className='bg-muted flex max-h-[500px] flex-col gap-8 overflow-y-scroll p-8'>
+      <FieldGroup
+        className={cn(
+          'bg-muted flex max-h-[500px] flex-col gap-8 overflow-y-scroll p-8',
+          className,
+        )}
+      >
         {/* General Subject Details */}
         <FieldSet>
           <FieldGroup>
@@ -156,14 +160,7 @@ function SubjectForm({
                       <FieldLabel htmlFor='subject-form_color' className='whitespace-nowrap'>
                         Color
                       </FieldLabel>
-
-                      <Input
-                        {...field}
-                        id='subject-form_color'
-                        placeholder='#f4f4f4'
-                        autoComplete='off'
-                        aria-invalid={fieldState.invalid}
-                      />
+                      <ColorPicker hex={field.value} onHexChange={field.onChange} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )
@@ -425,99 +422,3 @@ function SubjectForm({
 }
 
 export default SubjectForm
-
-function TimeInput({
-  value,
-  onChange,
-  id,
-  className,
-}: {
-  value: Time
-  onChange: (value: Time) => void
-  id: string
-} & ComponentClassNameProp) {
-  const [time, setTime] = useState<Time>(value)
-
-  /* sync when RHF changes externally (reset, setValue, etc.) */
-  useEffect(() => {
-    setTime(value)
-  }, [value])
-
-  const updateHours = (value: Time['hours']) => {
-    const newTime: Time = {
-      ...time,
-      hours: value,
-    }
-    setTime(newTime)
-    onChange(newTime)
-  }
-
-  const updateMinutes = (value: Time['minutes']) => {
-    const newTime: Time = {
-      ...time,
-      minutes: value,
-    }
-    setTime(newTime)
-    onChange(newTime)
-  }
-
-  const updateMeridiem = (value: Time['meridiem']) => {
-    const newTime: Time = {
-      ...time,
-      meridiem: value,
-    }
-    setTime(newTime)
-    onChange(newTime)
-  }
-
-  const meridiems: Time['meridiem'][] = ['AM', 'PM']
-
-  return (
-    <div className={cn('flex flex-row gap-4', className)}>
-      <div className='flex flex-row items-center gap-1'>
-        <Field orientation='horizontal'>
-          <Input
-            id={id}
-            type='number'
-            placeholder='12'
-            className='w-[75px]!'
-            value={time.hours}
-            onChange={(e) => updateHours(Number(e.target.value))}
-          />
-        </Field>
-        <TextBody>:</TextBody>
-        <Field>
-          <Input
-            type='number'
-            placeholder='00'
-            className='w-[75px]!'
-            value={time.minutes}
-            onChange={(e) => updateMinutes(Number(e.target.value))}
-          />
-        </Field>
-      </div>
-      <RadioGroup
-        defaultValue='am'
-        className='text-foreground! flex flex-row gap-0 divide-y rounded-md border'
-        onValueChange={(value) => updateMeridiem(value as Time['meridiem'])}
-      >
-        {meridiems.map((meridiem, index) => {
-          return (
-            <FieldLabel
-              key={index}
-              htmlFor={`${id}.${meridiem}`}
-              className='rounded-none! border-none hover:cursor-pointer'
-            >
-              <Field orientation='horizontal' className='py-2!'>
-                <FieldContent>
-                  <FieldTitle>{meridiem.toUpperCase()}</FieldTitle>
-                </FieldContent>
-                <RadioGroupItem value={meridiem} id={`${id}.${meridiem}`} className='hidden' />
-              </Field>
-            </FieldLabel>
-          )
-        })}
-      </RadioGroup>
-    </div>
-  )
-}

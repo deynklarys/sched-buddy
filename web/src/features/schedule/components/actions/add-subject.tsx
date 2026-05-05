@@ -11,41 +11,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Field } from '@/components/ui/field'
 import { useScheduleActions } from '@/features/schedule/store/use-schedule-store'
 import { CalendarPlusIcon } from 'lucide-react'
 import SubjectForm, { SubjectFormValue } from '../subject-form'
 import { useState } from 'react'
 import { subjectFromFormValues } from '../../lib/subjectMapper'
-import { TextBody } from '@/components/text'
 
 function AddSubject() {
   const [open, setOpen] = useState(false)
   const { addSubject } = useScheduleActions()
 
   const formId = 'add-subject'
-  const defaultValues: SubjectFormValue = {
-    title: '',
-    // Add default colors to choose from
-    color: '',
-    meetings: [
-      {
-        type: '',
-        instructor: '',
-        location: '',
-        days: [],
-        startTime: { hours: undefined, minutes: undefined, meridiem: 'AM' },
-        endTime: { hours: undefined, minutes: undefined, meridiem: 'AM' },
-      },
-    ],
-  }
 
   function onSubmit(data: SubjectFormValue) {
-    console.log(data)
-    // const newSubject = subjectFromFormValues(data)
+    const newSubject = subjectFromFormValues(data)
 
     /* Persist subject */
-    // addSubject(newSubject)
+    addSubject(newSubject)
 
     /* Programmatically close dialog on success */
     setOpen(false)
@@ -65,7 +47,7 @@ function AddSubject() {
           <DialogDescription>Adds a subject to the timetable</DialogDescription>
         </DialogHeader>
 
-        <SubjectForm formId={formId} defaultValues={defaultValues} onSubmit={onSubmit} />
+        <SubjectForm formId={formId} onSubmit={onSubmit} />
 
         <DialogFooter>
           <DialogClose asChild>
