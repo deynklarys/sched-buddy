@@ -36,29 +36,27 @@ export default function SelectSubjectDialogContent({
               >
                 <TextBody className='mb-0 font-bold'>{subject.title}</TextBody>
                 <div className='flex flex-col pl-0'>
-                  {subject.meetings.map((meeting) => {
+                  {subject.meetings.map((meeting, meetingIndex) => {
                     const startTime = denormalizeTime(meeting.startTime)
                     const endTime = denormalizeTime(meeting.endTime)
                     return (
                       <div
-                        key={`${subject}.${meeting.id}`}
+                        key={`${subject.id}.${meeting.id}.${meetingIndex}`}
                         className='mb-[-4px] flex flex-row items-end'
                       >
                         <TextSub className='mr-[3px]'>-</TextSub>
                         {meeting.days.map((day, dayIndex) => (
-                          <>
-                            <TextSub key={`${subject}.${meeting.id}.${day}.${dayIndex}`}>
-                              {day
-                                .trim()
-                                .toLowerCase()
-                                .split(/\s+/)
-                                .map((word) => word[0].toUpperCase() + word.slice(1))
-                                .join(' ')}
-                            </TextSub>
+                          <TextSub key={`${subject.id}.${meeting.id}.${meetingIndex}.${dayIndex}`}>
+                            {day
+                              .trim()
+                              .toLowerCase()
+                              .split(/\s+/)
+                              .map((word) => word[0].toUpperCase() + word.slice(1))
+                              .join(' ')}
                             {dayIndex !== meeting.days.length - 1 && (
-                              <TextSub className='mr-[2px]'>,</TextSub>
+                              <span className='mr-[2px]'>,</span>
                             )}
-                          </>
+                          </TextSub>
                         ))}
                         <TextSub className='ml-[3px]'>@</TextSub>
                         <TextSub>
