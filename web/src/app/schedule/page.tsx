@@ -38,7 +38,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <WidthContainer className='mt-16 mb-8 flex grow md:max-w-[1440px]'>
+    <WidthContainer className='mt-16 mb-8 flex grow'>
       <div className='flex grow flex-col gap-4 md:flex-row'>
         <div className='flex flex-col gap-4'>
           <AddSubject />
