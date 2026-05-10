@@ -204,27 +204,7 @@ def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
         job_id, len(table_data.headers), len(table_data.rows),
     )
 
-    # Persist raw JSON alongside the debug images
-    extracted_json_path = work_dir / f"extracted_{img_stem}.json"
-    extracted_json_path.write_text(
-        json.dumps(
-            {
-                "headers": table_data.headers,
-                "rows": table_data.rows,
-            },
-            ensure_ascii=False,
-            indent=2,
-        ),
-        encoding="utf-8",
-    )
-    logger.info("[%s] JSON saved → %s", job_id, extracted_json_path)
-
     return ExtractionResult(
-        image_file=image_path.name,
-        ocr_config=TESSERACT_CONFIG,
-        headers=table_data.headers,
-        rows=table_data.rows,
-        row_count=len(table_data.rows),
-        column_count=len(table_data.headers),
+        data=table_data.rows,
     )
 

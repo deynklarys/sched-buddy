@@ -32,14 +32,14 @@ const COLORS = [
 // ---------------------------------------------------------------------------
 
 function deriveMeetingType(
-  row: CourseRow,
+  data: CourseRow,
   scheduleIndex: number
 ): string | undefined {
-  const units = row.units;
+  const units = data.units;
   if (!units || typeof units === "number") return undefined;
 
   // If a subject has multiple schedules, heuristically label them
-  const schedules = row.schedules ?? [];
+  const schedules = data.schedules ?? [];
   if (schedules.length <= 1) return undefined;
 
   if (scheduleIndex === 0 && units.lec > 0) return "Lecture";
@@ -59,22 +59,22 @@ function deriveMeetingType(
  * @returns       - Subject[] ready to pass to the timetable UI
  */
 export function transformToSubjects(result: ExtractionResult): Subject[] {
-  return result.rows.map((row: CourseRow, rowIndex: number) => {
-    const color = COLORS[rowIndex % COLORS.length];
+  return result.data.map((data: CourseRow, dataIndex: number) => {
+    const color = COLORS[dataIndex % COLORS.length];
 
-    const meetings = (row.schedules ?? []).map((schedule, scheduleIndex) => ({
+    const meetings = (data.schedules ?? []).map((schedule, scheduleIndex) => ({
       id: crypto.randomUUID(),
       days: (schedule.days ?? []) as Day[],
       startTime: Number(schedule.time?.start ?? 0),
       endTime: Number(schedule.time?.end ?? 0),
-      type: deriveMeetingType(row, scheduleIndex),
+      type: deriveMeetingType(data, scheduleIndex),
       instructor: schedule.faculty ?? "",
       location: schedule.room ?? undefined,
     }));
 
     return {
       id: crypto.randomUUID(),
-      title: row.subject ?? row.code ?? "Unknown Subject",
+      title: data.subject ?? data.code ?? "Unknown Subject",
       color,
       meetings,
     } satisfies Subject;

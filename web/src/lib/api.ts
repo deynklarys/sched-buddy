@@ -43,12 +43,7 @@ export interface CourseRow {
 }
 
 export interface ExtractionResult {
-  image_file: string
-  ocr_config: string
-  headers: string[] // e.g. ["code","subject","units","class","days","time","room","faculty"]
-  rows: CourseRow[]
-  row_count: number
-  column_count: number
+  data: CourseRow[]
 }
 
 export interface Job {

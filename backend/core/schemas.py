@@ -65,20 +65,10 @@ class CourseRow(BaseModel):
 # ---------------------------------------------------------------------------
 
 class ExtractionResult(BaseModel):
-    image_file: str = Field(..., description="Original uploaded filename")
-    ocr_config: str = Field(..., description="Tesseract OCR configuration used")
-    headers: List[str] = Field(
-        default_factory=list,
-        description="Detected column headers (e.g. code, subject, units, …)",
-        examples=[["code", "subject", "units", "class", "days", "time", "room", "faculty"]],
-    )
-    rows: List[Any] = Field(
+    data: List[Any] = Field(
         default_factory=list,
         description="Extracted course rows. Each item is a CourseRow-shaped dict.",
     )
-    row_count: int = Field(0, description="Number of course rows extracted")
-    column_count: int = Field(0, description="Number of columns detected")
-
 
 # ---------------------------------------------------------------------------
 # API responses
