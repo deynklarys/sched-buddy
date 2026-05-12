@@ -23,12 +23,16 @@ import logging
 import shutil
 import sys
 from pathlib import Path
-from typing import Optional
 
 import cv2
 
 from core.config import settings
 from core.schemas import ExtractionResult
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(levelname)s] %(name)s: %(message)s",
+)
 
 logger = logging.getLogger(__name__)
 
@@ -76,21 +80,7 @@ def is_model_ready() -> bool:
 # ---------------------------------------------------------------------------
 
 def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
-    """
-    Run the full SchedBuddy table-extraction pipeline on *image_path*.
 
-    Parameters
-    ----------
-    image_path : Path
-        Absolute path to the uploaded image file.
-    job_id : str
-        Namespaces output files under OUTPUT_DIR/<job_id>/.
-
-    Returns
-    -------
-    ExtractionResult
-        Structured course schedule data ready to serialise as JSON.
-    """
     # ml/ modules — importable because _ML_DIR is in sys.path
     from config import TESSERACT_CONFIG           # ml/config.py
     from detector import BorderlessTableDetector  # ml/detector.py
@@ -107,9 +97,11 @@ def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
     img_stem = image_path.stem
     img_suffix = image_path.suffix
 
-    table_img_path = work_dir / f"table_{img_stem}.jpg"
-    label_path = work_dir / "labels" / f"{img_stem}.txt"
-    struct_img_path = work_dir / f"struct_{img_stem}.jpg"
+    TABLE_OUTPUT_PATH = work_dir / f"table_{img_stem}.jpg"
+    LABEL_PATH = work_dir / "labels" / f"{img_stem}.txt"
+    CROPPED_OUTPUT_PATH = work_dir / f"cropped_{img_stem}.jpg"
+    STRUCT_OUTPUT_PATH = work_dir / f"struct_{img_stem}.jpg"
+    EXTRACTED_JSON_PATH = work_dir / f"extracted_{img_stem}.json"
 
     # -----------------------------------------------------------------------
     # Stage 2 — Table detection (YOLO)
@@ -129,18 +121,19 @@ def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
     # -----------------------------------------------------------------------
     # Stage 2b — Crop detected table region
     # -----------------------------------------------------------------------
-    image = cv2.imread(str(table_img_path))
-    if image is None:
-        raise RuntimeError(f"Cannot read YOLO output image: {table_img_path}")
 
-    if not label_path.exists():
+    image = cv2.imread(str(preprocessed.output_path))
+    if image is None:
+        raise RuntimeError(f"Cannot read YOLO output image: {preprocessed.output_path}")
+
+    if not LABEL_PATH.exists():
         raise RuntimeError(
             "No table detected in this image — YOLO produced no label file. "
-            f"Expected: {label_path}"
+            f"Expected: {LABEL_PATH}"
         )
 
     height, width = image.shape[:2]
-    raw_lines = label_path.read_text(encoding="utf-8").splitlines()
+    raw_lines = LABEL_PATH.read_text(encoding="utf-8").splitlines()
     lines = [l.strip() for l in raw_lines if l.strip()]
 
     if not lines:
@@ -175,16 +168,15 @@ def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
     if cropped.size == 0:
         raise RuntimeError("Cropped region is empty.")
 
-    cropped_path = work_dir / f"cropped_{img_stem}{img_suffix}"
-    cv2.imwrite(str(cropped_path), cropped)
-    logger.info("[%s] Cropped table → %s", job_id, cropped_path)
+    cv2.imwrite(str(CROPPED_OUTPUT_PATH), cropped)
 
     # -----------------------------------------------------------------------
     # Stage 3 — Structure detection (Table Transformer)
     # -----------------------------------------------------------------------
+
     detector = BorderlessTableDetector(
-        image_path=str(cropped_path),
-        output_path=str(struct_img_path),
+        image_path=CROPPED_OUTPUT_PATH,
+        output_path=STRUCT_OUTPUT_PATH,
     )
     detector.load_image()
     detections, _ = detector.process(
