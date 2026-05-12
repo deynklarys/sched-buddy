@@ -82,7 +82,7 @@ def is_model_ready() -> bool:
 def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
 
     # ml/ modules — importable because _ML_DIR is in sys.path
-    from config import TESSERACT_CONFIG           # ml/config.py
+    from preprocess import preprocess             # ml/preprocess.py
     from detector import BorderlessTableDetector  # ml/detector.py
     from extraction import extract_table          # ml/extraction.py
 
@@ -104,19 +104,27 @@ def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
     EXTRACTED_JSON_PATH = work_dir / f"extracted_{img_stem}.json"
 
     # -----------------------------------------------------------------------
+    # Stage 1: Preprocessing
+    # -----------------------------------------------------------------------
+
+    preprocessed = preprocess(str(image_path))
+
+    # -----------------------------------------------------------------------
     # Stage 2 — Table detection (YOLO)
     # -----------------------------------------------------------------------
+
     model = _get_yolo()
+    
     results = model.predict(
-        source=str(image_path),
+        source=str(preprocessed.output_path),
         conf=settings.YOLO_CONF_THRESHOLD,
         save_txt=True,
         project=str(work_dir),
         name=".",
         exist_ok=True,
     )
-    results[0].save(str(table_img_path))
-    logger.info("[%s] YOLO done → %s", job_id, table_img_path)
+
+    results[0].save(str(TABLE_OUTPUT_PATH))
 
     # -----------------------------------------------------------------------
     # Stage 2b — Crop detected table region
