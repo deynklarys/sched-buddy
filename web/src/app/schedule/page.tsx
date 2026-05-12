@@ -8,16 +8,9 @@ import DeleteSubject from '@/features/schedule/components/actions/delete-subject
 import EditSubject from '@/features/schedule/components/actions/edit-subject'
 import { useCanvasEngine } from '@/features/canvas-engine/use-canvas-engine-store'
 import ScheduleView from '@/features/schedule/components/schedule-view'
-import {
-  FolderUpIcon,
-  ImageDownIcon,
-  PlusIcon,
-  ScanQrCodeIcon,
-  WandSparklesIcon,
-} from 'lucide-react'
-import AddBackgroundImage from '@/features/schedule/components/actions/add-background-image'
+import { FolderUpIcon, Image, ImageDownIcon, PlusIcon } from 'lucide-react'
 import { TextBody } from '@/components/text'
-import AddBackgroundFill from '@/features/schedule/components/actions/add-background-fill'
+import ChangeBackground from '@/features/schedule/components/actions/change-background'
 
 export default function SchedulePage() {
   const canvasEngine = useCanvasEngine()
@@ -46,13 +39,12 @@ export default function SchedulePage() {
           <DeleteSubject />
           <div className='flex w-full flex-col items-center rounded-lg border-2'>
             <div className='flex w-full flex-row items-center justify-center gap-2 border-b-2 py-4'>
-              <WandSparklesIcon />
+              <Image />
               <TextBody>Customize</TextBody>
             </div>
             <div className='flex w-full flex-col gap-2 px-4 pb-4'>
               <TextBody className='mt-4'>Background</TextBody>
-              <AddBackgroundImage />
-              <AddBackgroundFill />
+              <ChangeBackground />
               <TextBody className='mt-4'>Timetable</TextBody>
               <ChangeDisplay />
               <Button variant='outline'>To-implement</Button>
