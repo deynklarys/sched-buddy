@@ -129,9 +129,14 @@ class DaysHandler(ColumnHandler):
                     i += len(abbr)
                     break
             else:
-                raise ValueError(
-                    f"Unrecognised day token at position {i}: {text[i:]!r}"
-                )
+                logger.warning(f"Unrecognised day token at position {i}: {text[i:]!r}; sending empty string")
+                result.append("")
+                i += 1
+        
+        if all(day == "" for day in result):
+            logger.warning(f"Failed to parse any valid day tokens from: {text!r}; returning empty list")
+            return []
+            
         return result
 
 
