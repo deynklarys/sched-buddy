@@ -85,6 +85,8 @@ def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
     from preprocess import preprocess             # ml/preprocess.py
     from detector import BorderlessTableDetector  # ml/detector.py
     from extraction import extract_table          # ml/extraction.py
+    from postprocess import serialize_row, validate_course_rows  # ml/extraction.py
+    from models import TableData                  # ml/models.py
 
     # -----------------------------------------------------------------------
     # Per-job workspace inside backend/outputs/<job_id>/
@@ -198,13 +200,38 @@ def run_pipeline(image_path: Path, job_id: str) -> ExtractionResult:
     # -----------------------------------------------------------------------
     # Stage 4 — Data extraction (OCR + validation)
     # -----------------------------------------------------------------------
+
     table_data = extract_table(detector, detections)
-    logger.info(
-        "[%s] Extraction done — %d headers, %d rows",
-        job_id, len(table_data.headers), len(table_data.rows),
+    
+    # -----------------------------------------------------------------------
+    # Stage 5: Data postprocessing and validation
+    # -----------------------------------------------------------------------
+
+    # NOTE: UnitsHandler return a class breakdown dict, which fails CourseRow validation, so we serialize it before validation.
+    serialized_row = [serialize_row(row) for row in table_data.rows]
+    serialized_table_data = TableData(headers=table_data.headers, rows=serialized_row, cells=table_data.cells)
+    
+    normalized_table_data = validate_course_rows(table=serialized_table_data)
+
+    # -----------------------------------------------------------------------
+    # Optional Stage: Data Export
+    # -----------------------------------------------------------------------
+
+    Path(EXTRACTED_JSON_PATH).write_text(
+        json.dumps(
+            {
+                "image_file": str(image_path),
+                "headers": normalized_table_data.headers,
+                "rows": normalized_table_data.rows,
+            },
+            ensure_ascii=False,
+            indent=2
+        ),
+        encoding="utf-8"
     )
+    print("Table JSON saved: %s" % EXTRACTED_JSON_PATH)
 
     return ExtractionResult(
-        data=table_data.rows,
+        data=normalized_table_data.rows,
     )
 
