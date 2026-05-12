@@ -18,6 +18,8 @@ from rapidfuzz import fuzz
 from abc import ABC, abstractmethod
 from typing import Any
 
+from models import UnitBreakdown
+
 logger = logging.getLogger(__name__)
 
 class ColumnHandler(ABC):
@@ -83,15 +85,13 @@ class UnitsHandler(ColumnHandler):
 
     @property
     def sub_columns(self) -> tuple[str, ...]:
-        """The active sub-column names (read-only)."""
         return self._sub_cols
 
-    def parse_cell(self, text: str) -> dict[str, float]:
-        """Return ``{sub_col: value, …}`` for *text*."""
+    def parse_cell(self, text: str) -> UnitBreakdown:
         numbers = re.findall(r"\d+(?:\.\d+)?", text.replace(",", "."))
-        result: dict[str, float] = dict.fromkeys(self._sub_cols, 0.0)
-        result.update(zip(self._sub_cols, map(float, numbers)))
-        return result
+        parsed = dict.fromkeys(self._sub_cols, 0.0)
+        parsed.update(zip(self._sub_cols, map(float, numbers)))
+        return UnitBreakdown(**parsed)
 
 
 class DaysHandler(ColumnHandler):
