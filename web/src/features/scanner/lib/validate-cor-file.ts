@@ -3,7 +3,7 @@ const fileConditions = {
   maxMB: 5,
 }
 
-export function validateCORFileType(file: File): string | null {
+export function validateCORFile(file: File): string | null {
   if (!fileConditions.acceptedTypes.includes(file.type)) {
     throw new Error('Only PNG, JPEG, and PDF files are supported.')
   }

@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { ScanQrCode } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { validateCORFileType as validateCORFile } from '../lib/validate-cor-file-type'
+import { validateCORFile as validateCORFile } from '../lib/validate-cor-file'
 import { toast } from 'sonner'
 import { TextBody, TextHeadingSM, TextSub } from '@/components/text'
 import { cn } from '@/lib/utils'

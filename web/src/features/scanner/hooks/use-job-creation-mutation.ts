@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { apiPOST } from '../lib/api'
 import { SubmitResponse } from '../schemas'
 
-export function useScanCORJobMutation() {
+export function useJobCreationMutation() {
   return useMutation<SubmitResponse, string, File>({
     mutationFn: async (file) => {
       const form = new FormData()

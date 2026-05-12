@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useScanCORJobMutation } from './use-scan-cor-job-mutation'
+import { useJobCreationMutation } from './use-job-creation-mutation'
 import jobPollQueryOptions from '../query-options/job-poll-query-options'
 import { apiDELETE, ApiError } from '../lib/api'
 import type { ExtractionResult, Job } from '../schemas'
@@ -44,7 +44,7 @@ export function useCORExtraction(): UseCORExtractionReturn {
   const isInProgressRef = useRef(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const { mutateAsync } = useScanCORJobMutation()
+  const { mutateAsync: createJob } = useJobCreationMutation()
 
   const { data: polledJob, isLoading: isPolling } = useQuery(
     jobPollQueryOptions(
@@ -142,15 +142,16 @@ export function useCORExtraction(): UseCORExtractionReturn {
       setPhase('uploading')
 
       try {
-        const submitRes = await mutateAsync(file)
-        setJobId(submitRes.job_id)
+        const res = await createJob(file)
+        setJobId(res.job_id)
         setPhase('processing')
 
         /* Stop polling and clean up if the job takes too long */
         timeoutRef.current = setTimeout(async () => {
           setError('Extraction timed out. Please try again.')
-          const currentJobId = submitRes.job_id
+          const currentJobId = res.job_id
           teardown()
+          /* If deleteJob() fails, error is not set. Could be included in the message */
           await deleteJob(currentJobId)
         }, POLL_TIMEOUT_MS)
       } catch (err) {
@@ -159,7 +160,7 @@ export function useCORExtraction(): UseCORExtractionReturn {
         teardown()
       }
     },
-    [mutateAsync, deleteJob, teardown],
+    [createJob, deleteJob, teardown],
   )
 
   const reset = useCallback(async () => {
