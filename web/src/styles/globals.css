@@ -67,20 +67,20 @@
   --neutral-100: #ffffff;
   --neutral-200: #fbfaf9;
   --neutral-300: #d8d8d8;
-  --neutral-400: #474645;
-  /* Use this for the headings */
-  --neutral-500: #171717;
+  --neutral-400: #848281;
+  --neutral-500: #474645;
+  --neutral-600: #171717;
 
   /* Modified Shadcn */
   --background: var(--neutral-100);
-  --foreground: var(--neutral-400);
-  --foreground-100: var(--neutral-400);
-  --foreground-200: var(--neutral-500);
+  --foreground: var(--neutral-500);
+  --foreground-100: var(--neutral-500);
+  --foreground-200: var(--neutral-600);
 
   --card: var(--neutral-100);
-  --card-foreground: var(--neutral-400);
+  --card-foreground: var(--neutral-500);
   --popover: var(--neutral-100);
-  --popover-foreground: var(--neutral-400);
+  --popover-foreground: var(--neutral-500);
 
   --muted: var(--neutral-200);
   --muted-foreground: var(--neutral-400);
