@@ -13,24 +13,31 @@ from column_handlers import ColumnHandler, get_handler
 from course_db import CourseDatabase
 from models import CellRecord, Detection, TableData
 from utils import bbox_intersection, ocr_crop
+from postprocess import fill_missing_slots
 
 logger = logging.getLogger(__name__)
 
 HEADER_NAMES = ["code", "subject", "units", "class", "days", "time", "room", "faculty"]
 
+# ---------------------------------------------------------------------------
 # Default course database
+# ---------------------------------------------------------------------------
 logger.info("⚠️  Loading default course database...")
 default_course_db: CourseDatabase = CourseDatabase.from_dir(
     Path(__file__).parent / "databases"
 )
 
-# Fuzzy matching
+# ---------------------------------------------------------------------------
+# Fuzzy matching helpers
+# ---------------------------------------------------------------------------
+
 def _best_fuzzy_match(
     query: str,
     candidates: list[str],
     min_score: int = 0,
 ) -> tuple[str, float]:
     best_name, best_score = query, -1
+    query_norm = query.lower().strip()
     for candidate in candidates:
         score = max(
             fuzz.partial_ratio(query, candidate),
@@ -48,9 +55,17 @@ def match_course(
     min_score: int = 0,
     db: CourseDatabase | None = None,
 ) -> tuple[str, int, str]:
-    return (db or default_course_db).match(extracted_text, min_score)
+    matched_code, score, subject = (db or default_course_db).match(extracted_text, min_score)
+    if score < min_score:
+        logger.info("No match for code %r (best: %r with score %d): sending empty string", extracted_text, matched_code, score)
+        matched_code = ""
+    return matched_code, score, subject
 
-# Header OCR  (runs first, before any data extraction)
+
+# ---------------------------------------------------------------------------
+# Column-handler resolution (runs before cell extraction)
+# ---------------------------------------------------------------------------
+
 def _resolve_column_handlers(
     detector,
     columns: list,
@@ -71,21 +86,25 @@ def _resolve_column_handlers(
     names:    list[str]           = []
     handlers: list[ColumnHandler] = []
 
-    for col in columns:
+    # FIXME: assign default headers due to poor structural detection; can remove once structure detection is improved.
+    for col, header_name in zip(columns, HEADER_NAMES):
         cell = bbox_intersection(header_box, col.bbox)
         raw  = ocr_crop(detector.image, cell).strip() if cell else ""
 
         canonical, score = match_header(raw, min_score=70)
-        logger.info("Header match: %r → %r (score: %d)", raw, canonical, score)
+        logger.info("Header match: %r → %r (score: %d): but using assigned header names", raw, canonical, score)
 
-        handler = get_handler(canonical)
+        handler = get_handler(header_name)
         handler.configure(raw)
 
-        names.append(canonical)
+        names.append(header_name)
         handlers.append(handler)
 
     return names, handlers
 
+# ---------------------------------------------------------------------------
+# Multiline row expansion
+# ---------------------------------------------------------------------------
 
 def _expand_multiline_rows(
     row: dict[str, Any],
@@ -118,6 +137,62 @@ def _expand_multiline_rows(
 
     return [{**shared, "schedules": schedules}]
 
+# ---------------------------------------------------------------------------
+# Schedule-slot parsing (called per entry, not per row)
+# ---------------------------------------------------------------------------
+
+def _parse_schedule_slots(
+    entry: dict[str, Any],
+    header_names: list[str],
+    handlers: list[ColumnHandler],
+) -> None:
+    """Try to parse every raw-string field in each schedule slot."""
+    handler_map = dict(zip(header_names, handlers))
+    for slot in entry.get("schedules", []):
+        for field, raw in list(slot.items()):
+            if not isinstance(raw, str) or not raw.strip():
+                continue
+            handler = handler_map.get(field)
+            if handler is None:
+                continue
+            try:
+                slot[field] = handler.parse_cell(raw)
+            except (ValueError, KeyError):
+                logger.warning(
+                    "Handler %s failed on slot field %r=%r; "
+                    "value kept as raw text for fallback processing.",
+                    type(handler).__name__, field, raw,
+                )
+
+
+# ---------------------------------------------------------------------------
+# Course-code post-processing
+# ---------------------------------------------------------------------------
+
+def _apply_course_matching(
+    rows: list[dict[str, Any]],
+    header_names: list[str],
+    db: CourseDatabase | None = None,
+) -> None:
+    if not header_names:
+        return
+    code_col = header_names[0]
+    subj_col = header_names[1] if len(header_names) > 1 else None
+
+    for row in rows:
+        raw = row.get(code_col, "")
+        if not isinstance(raw, str) or not raw.strip():
+            continue
+        matched_code, score, subject = match_course(raw, min_score=70, db=db)
+        logger.info("Course match: %r → %r (score: %d)", raw, matched_code, score)
+        row[code_col] = matched_code
+        if subj_col:
+            row[subj_col] = subject
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
 
 def extract_table(
     detector,
@@ -139,13 +214,13 @@ def extract_table(
     )
     header_dets = [d for d in detections if "header" in d.label.lower()]
 
-    # 1. Header OCR first so handlers are configured before data rows
+    # 1. Header OCR — must run before cell extraction so handlers are ready.
     header_names, handlers = _resolve_column_handlers(detector, columns, header_dets)
     schedule_fields = {
         name for name, h in zip(header_names, handlers) if h.is_schedule_field
     }
 
-    # 2. Cell extraction
+    # 2. Cell extraction — schedule fields kept raw; others parsed immediately.
     cell_records:  list[CellRecord] = []
     rows_as_dicts: list[dict]       = []
     data_rows = rows[1:] if len(rows) > 1 else []
@@ -186,7 +261,11 @@ def extract_table(
 
         rows_as_dicts.extend(expanded)
 
-    # 3. Post-process: fuzzy-match course codes
+    # 3. Fallback: fill any schedule slot whose days or time could not be
+    #    parsed from OCR with the earliest non-overlapping free slot.
+    fill_missing_slots(rows_as_dicts)
+
+    # 4. Post-process: fuzzy-match course codes against the database.
     _apply_course_matching(rows_as_dicts, header_names, db=db)
 
     logger.info(
@@ -198,49 +277,3 @@ def extract_table(
         rows=rows_as_dicts,
         cells=[asdict(c) for c in cell_records],
     )
-
-def _parse_schedule_slots(
-    entry: dict[str, Any],
-    header_names: list[str],
-    handlers: list[ColumnHandler],
-) -> None:
-    logger.info("⚠️  Parsing schedule slots for entry: %s", entry)
-
-    handler_map = dict(zip(header_names, handlers))
-    for slot in entry.get("schedules", []):
-        for field, raw in list(slot.items()):
-            if not isinstance(raw, str) or not raw.strip():
-                continue
-            handler = handler_map.get(field)
-            if handler is None:
-                continue
-            try:
-                slot[field] = handler.parse_cell(raw)
-            except (ValueError, KeyError):
-                logger.warning(
-                    "Handler %s failed on slot field %r=%r; keeping raw text.",
-                    type(handler).__name__, field, raw,
-                )
-
-
-def _apply_course_matching(
-    rows: list[dict[str, Any]],
-    header_names: list[str],
-    db: CourseDatabase | None = None,
-) -> None:
-    logger.info("⚠️  Applying course code matching to %d rows", len(rows))
-
-    if not header_names:
-        return
-    code_col = header_names[0]
-    subj_col = header_names[1] if len(header_names) > 1 else None
-
-    for row in rows:
-        raw = row.get(code_col, "")
-        if not isinstance(raw, str) or not raw.strip():
-            continue
-        matched_code, score, subject = match_course(raw, min_score=70, db=db)
-        logger.info("Course match: %r → %r (score: %d)", raw, matched_code, score)
-        row[code_col] = matched_code
-        if subj_col:
-            row[subj_col] = subject

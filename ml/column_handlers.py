@@ -18,6 +18,8 @@ from rapidfuzz import fuzz
 from abc import ABC, abstractmethod
 from typing import Any
 
+from models import UnitBreakdown
+
 logger = logging.getLogger(__name__)
 
 class ColumnHandler(ABC):
@@ -31,6 +33,11 @@ class ColumnHandler(ABC):
         from the header text).  The default implementation is a no-op.
         """
 
+    @property
+    def sub_columns(self) -> tuple[str, ...]:
+        """The active sub-column names (read-only). Override in subclasses."""
+        return ()
+
     @abstractmethod
     def parse_cell(self, text: str) -> Any:
         """Convert raw OCR *text* for this column into a structured value."""
@@ -38,7 +45,8 @@ class ColumnHandler(ABC):
 # Concrete handlers
 class DefaultHandler(ColumnHandler):
     def parse_cell(self, text: str) -> str:
-        return text.strip()
+        cleaned = re.sub(r"[^a-zA-Z0-9\-\s]", "", text).lower().strip()
+        return cleaned
 
 class UnitsHandler(ColumnHandler):
 
@@ -83,15 +91,13 @@ class UnitsHandler(ColumnHandler):
 
     @property
     def sub_columns(self) -> tuple[str, ...]:
-        """The active sub-column names (read-only)."""
         return self._sub_cols
 
-    def parse_cell(self, text: str) -> dict[str, float]:
-        """Return ``{sub_col: value, …}`` for *text*."""
+    def parse_cell(self, text: str) -> UnitBreakdown:
         numbers = re.findall(r"\d+(?:\.\d+)?", text.replace(",", "."))
-        result: dict[str, float] = dict.fromkeys(self._sub_cols, 0.0)
-        result.update(zip(self._sub_cols, map(float, numbers)))
-        return result
+        parsed = dict.fromkeys(self._sub_cols, 0.0)
+        parsed.update(zip(self._sub_cols, map(float, numbers)))
+        return UnitBreakdown(**parsed)
 
 
 class DaysHandler(ColumnHandler):
@@ -129,51 +135,76 @@ class DaysHandler(ColumnHandler):
                     i += len(abbr)
                     break
             else:
-                raise ValueError(
-                    f"Unrecognised day token at position {i}: {text[i:]!r}"
-                )
+                logger.warning(f"Unrecognised day token at position {i}: {text[i:]!r}; sending empty string")
+                result.append("")
+                i += 1
+        
+        if all(day == "" for day in result):
+            logger.warning(f"Failed to parse any valid day tokens from: {text!r}; returning empty list")
+            return []
+            
         return result
 
-
-import re
-from datetime import time
 
 class TimeHandler(ColumnHandler):
     is_schedule_field = True
 
-    # Matches: 8:00 AM, 08:00AM, 10:30 pm — tolerates missing space before meridian
+    # Matches "HH:MM AM/PM" with OCR-tolerant separators and optional dots
     _TIME_RE = re.compile(
-        r'(\d{1,2}):(\d{2})\s*(AM|PM)',
+        r'(\d{1,2})[:;](\d{2})\s*([AaPp]\.?\s*[Mm]\.?)',
         re.IGNORECASE
     )
+    _RANGE_SEP = re.compile(r'\s*[-–—]\s*')
 
     def parse_cell(self, text: str) -> dict[str, int]:
-        matches = self._TIME_RE.findall(text)
-        if len(matches) < 2:
-            raise ValueError(
-                f"Expected two time values (HH:MM AM/PM) in: {text!r}"
-            )
+        # Normalise OCR noise: P.M. → PM, semicolons, extra spaces
+        cleaned = re.sub(r'([AaPp])\.?\s*([Mm])\.?', r'\1\2', text)
+        cleaned = re.sub(r';', ':', cleaned)
+        cleaned = ' '.join(cleaned.split())
 
-        start = self._to_minutes(*matches[0])
-        end   = self._to_minutes(*matches[1])
+        parts = self._RANGE_SEP.split(cleaned, maxsplit=1)
+        matches = [self._TIME_RE.search(p) for p in parts]
+
+        if not matches[0] or len(matches) < 2 or not matches[1]:
+            raise ValueError(f"Expected 'HH:MM AM/PM - HH:MM AM/PM', got: {text!r}")
+
+        start = self._to_minutes(*matches[0].groups())
+        end   = self._to_minutes(*matches[1].groups())
+
+        if start >= end:
+            raise ValueError(f"Invalid time range in: {text!r}")
+
         return {"start": start, "end": end}
 
     @staticmethod
     def _to_minutes(hour: str, minute: str, meridian: str) -> int:
         h, m = int(hour), int(minute)
-        mer = meridian.upper()
+        mer = re.sub(r'[.\s]', '', meridian).upper()
+
+        if not (1 <= h <= 12 and 0 <= m <= 59):
+            raise ValueError(f"Out-of-range time: {hour}:{minute}")
+
         if mer == "PM" and h != 12:
             h += 12
         elif mer == "AM" and h == 12:
             h = 0
         return h * 60 + m
 
+# NOTE: The following handlers are quite lenient in what they accept, as room/faculty fields are often noisy and we don't want to lose valid data if the formatting is unexpected.  They do, however, strip out obviously invalid characters (e.g. punctuation in room names)
 class RoomHandler(ColumnHandler):
     is_schedule_field = True
 
     def parse_cell(self, text: str) -> str:
         """Return the room location as a string."""
-        return text.strip()
+        cleaned = text.strip()
+
+        if not cleaned:
+            return ""
+        
+        cleaned = re.sub(r'[^a-zA-Z0-9\s\-]', ' ', cleaned)
+        cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+
+        return cleaned
 
 
 class FacultyHandler(ColumnHandler):
@@ -181,7 +212,15 @@ class FacultyHandler(ColumnHandler):
 
     def parse_cell(self, text: str) -> str:
         """Return the faculty name as a string."""
-        return text.strip()
+        cleaned = text.strip()
+        
+        if not cleaned:
+            return ""
+        
+        cleaned = re.sub(r'[^a-zA-Z\s\.\-\,]', '', cleaned)
+        cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+                    
+        return cleaned
 
 
 # Registry

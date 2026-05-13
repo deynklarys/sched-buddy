@@ -66,7 +66,7 @@ def _run_pipeline_task(job_id: str, image_path: Path):
 @router.get("/health", response_model=HealthResponse, tags=["System"])
 async def health():
     """Liveness + model readiness check. Also reports whether ml/ directory is reachable."""
-    from ml.pipeline import is_model_ready
+    from pipeline import is_model_ready
     return HealthResponse(
         status="ok",
         model_loaded=is_model_ready(),
