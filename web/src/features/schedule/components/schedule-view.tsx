@@ -1,6 +1,7 @@
 import { CanvasEngine } from '@/features/canvas-engine/canvas-engine'
 import { useEffect, useRef } from 'react'
 import {
+  useScheduleBackgroundImageCropArea,
   useScheduleHasHydrated,
   useScheduleStore,
 } from '../store/use-schedule-store'
@@ -12,6 +13,7 @@ import {
   useCanvasEngineStore,
 } from '@/features/canvas-engine/use-canvas-engine-store'
 import { useShallow } from 'zustand/shallow'
+import { getBackgroundImageDB } from '../db/background-image'
 
 export default function ScheduleView() {
   const canvasContainerRef = useRef<HTMLDivElement | null>(null)
@@ -20,10 +22,10 @@ export default function ScheduleView() {
   const hasScheduleContextHydrated = useScheduleHasHydrated()
   const hasCanvasEngineContextHydrated = useCanvasEngineHasHydrated()
 
-  const statesHydrated =
-    hasScheduleContextHydrated && hasCanvasEngineContextHydrated
+  const statesHydrated = hasScheduleContextHydrated && hasCanvasEngineContextHydrated
 
   const scheduleState = useScheduleStore(useShallow((s) => s))
+  const backgroundImageCropArea = useScheduleBackgroundImageCropArea()
   const canvasViewportState = useCanvasEngineStore(
     useShallow((s) => ({
       zoom: s.zoom,
@@ -64,6 +66,19 @@ export default function ScheduleView() {
     }
   }, [statesHydrated, setEngine])
 
+  /* Change the schedule background image on change and on initial load */
+  useEffect(() => {
+    async function addBackgroundImage() {
+      if (!backgroundImageCropArea || !canvasEngine) return
+
+      const backgroundImageUrl = await getBackgroundImageDB()
+      if (!backgroundImageUrl) return
+
+      await canvasEngine.addBackgroundImage(backgroundImageUrl, backgroundImageCropArea)
+    }
+    addBackgroundImage()
+  }, [backgroundImageCropArea, canvasEngine])
+
   /* Rerender the canvas when the states changes */
   useEffect(
     () => {
@@ -76,7 +91,8 @@ export default function ScheduleView() {
         return
       }
 
-      const { clientWidth, clientHeight } = canvasContainerRef.current
+      const { clientWidth, clientHeight } = canvasContainerRef.current!
+
       canvasEngine.render(scheduleState, canvasViewportState)
       canvasEngine.resize(clientWidth, clientHeight)
     },
@@ -88,11 +104,7 @@ export default function ScheduleView() {
   /* Attach the resize listener */
   useEffect(() => {
     const handleResize = () => {
-      if (
-        !canvasEngine ||
-        !canvasElementRef.current ||
-        !canvasContainerRef.current
-      ) {
+      if (!canvasEngine || !canvasElementRef.current || !canvasContainerRef.current) {
         return
       }
 

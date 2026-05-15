@@ -12,6 +12,7 @@ type ScheduleStoreActions = {
   addSubject: (subject: Subject) => void
   editSubject: (subject: Subject) => void
   deleteSubject: (subject: Subject) => void
+  setBackgroundImageCropArea: (cropArea: BackgroundImageCropArea | null) => void
   setDisplay: (display: Display | null) => void
   setOrientation: (orientation: DisplayOrientation) => void
   setHasHydrated: () => void
@@ -24,9 +25,17 @@ export type Settings = {
   startOfWeek: Extract<Day, 'sunday' | 'monday'>
 }
 
+export type BackgroundImageCropArea = {
+  width: number
+  height: number
+  x: number
+  y: number
+}
+
 export type ScheduleStoreState = {
   settings: Settings
   subjects: Subject[]
+  backgroundImageCropArea: BackgroundImageCropArea | null
   display: Display | null
   orientation: DisplayOrientation
   hasHydrated: boolean
@@ -44,6 +53,7 @@ export const useScheduleStore = create<ScheduleStoreState>()(
           showWeekend: false,
         },
         subjects: [],
+        backgroundImageCropArea: null,
         display: displays[0],
         hasHydrated: false,
         orientation: 'portrait',
@@ -101,6 +111,7 @@ export const useScheduleStore = create<ScheduleStoreState>()(
               subjects: state.subjects.filter((s) => s.id !== subject.id),
             }))
           },
+          setBackgroundImageCropArea: (cropArea) => set({ backgroundImageCropArea: cropArea }),
           setDisplay: (display) => set({ display }),
           setOrientation: (orientation) => set({ orientation }),
           setHasHydrated: () => set({ hasHydrated: true }),
@@ -112,11 +123,11 @@ export const useScheduleStore = create<ScheduleStoreState>()(
       partialize: (state) => ({
         subjects: state.subjects,
         display: state.display,
+        backgroundImageCropArea: state.backgroundImageCropArea,
         orientation: state.orientation,
         hasHydrated: state.hasHydrated,
       }),
       onRehydrateStorage: () => (state) => {
-        console.log('Schedule Context hydrated!')
         state?.actions.setHasHydrated()
       },
     },
@@ -125,6 +136,10 @@ export const useScheduleStore = create<ScheduleStoreState>()(
 
 export function useScheduleHasHydrated() {
   return useScheduleStore((state) => state.hasHydrated)
+}
+
+export function useScheduleBackgroundImageCropArea() {
+  return useScheduleStore((state) => state.backgroundImageCropArea)
 }
 
 export function useScheduleActions() {

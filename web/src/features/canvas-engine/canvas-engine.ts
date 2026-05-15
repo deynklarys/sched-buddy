@@ -86,7 +86,7 @@ export class CanvasEngine {
   private DEFAULT_START_TIME = 8 * 60
   private DEFAULT_END_TIME = 17 * 60
 
-  private backgroundImage: FabricImage | null = null
+  private BACKGROUND_IMAGE: FabricImage | null = null
 
   private onObjectModified: SetObjectOverride | null = null
 
@@ -200,7 +200,6 @@ export class CanvasEngine {
 
     this._restoreSavedObjectsState(viewport)
 
-    this.CANVAS.backgroundColor = '#ff0000'
     this.CANVAS.requestRenderAll()
   }
 
@@ -365,7 +364,6 @@ export class CanvasEngine {
     if (overflowedSubjects.length === 0) {
       return this.DEFAULT_GRID_HEIGHT
     }
-    console.log('overflowed subjects: ', overflowedSubjects)
     // return this.DEFAULT_GRID_HEIGHT
 
     /* Find the meeeting that overflows the most */
@@ -824,8 +822,8 @@ export class CanvasEngine {
     return await this.TIMETABLE_GROUP.clone()
   }
 
-  async addImage(
-    imageUrl: string,
+  async addBackgroundImage(
+    imageUrl: string | null,
     cropPixels: {
       x: number
       y: number
@@ -833,14 +831,22 @@ export class CanvasEngine {
       height: number
     },
   ): Promise<void> {
-    const { width: canvasWidth, height: canvasHeight } = this.getCanvasDimenstions()
-
-    if (this.backgroundImage) {
-      this.CANVAS.remove(this.backgroundImage)
+    if (!imageUrl) {
+      /* Possibly remove image */
+      return
     }
 
+    const { width: canvasWidth, height: canvasHeight } = this.getCanvasDimenstions()
+
+    /* If there is already an existing image, remove it */
+    if (this.BACKGROUND_IMAGE) {
+      this.CANVAS.remove(this.BACKGROUND_IMAGE)
+    }
+
+    /* Create image object */
     const img = await FabricImage.fromURL(imageUrl)
 
+    /* Crop and position it */
     img.set({
       cropX: cropPixels.x,
       cropY: cropPixels.y,
@@ -856,7 +862,7 @@ export class CanvasEngine {
       eventable: false,
     })
 
-    this.backgroundImage = img
+    this.BACKGROUND_IMAGE = img
 
     this.CANVAS.add(img)
     this.CANVAS.sendObjectToBack(img)
