@@ -1,3 +1,4 @@
+import { BackgroundImageContext } from './../schedule/store/use-schedule-store'
 import {
   Canvas,
   FabricImage,
@@ -149,6 +150,10 @@ export class CanvasEngine {
   }
 
   render(state: ScheduleStoreState, viewport: ViewportState) {
+    console.log('rendering')
+
+    const backgroundImage = this.BACKGROUND_IMAGE
+
     this.CANVAS.clear()
     const defaultTimetableStyle: TimetableStyle = {
       grid: {
@@ -203,6 +208,14 @@ export class CanvasEngine {
       this._resetAllObjectPosition()
     } else {
       this._restoreSavedObjectsState(viewport)
+    }
+
+    /* If there was a background image and the dimension has not changed, bring back the image.
+       Else, let the outside handle it xd */
+    if (backgroundImage && !canvasDimensionChanged) {
+      this.BACKGROUND_IMAGE = backgroundImage
+      this.CANVAS.add(backgroundImage)
+      this.CANVAS.sendObjectToBack(backgroundImage)
     }
 
     this.CANVAS.backgroundColor = '#fb8500'
@@ -869,18 +882,16 @@ export class CanvasEngine {
   }
 
   async addBackgroundImage(
-    imageUrl: string | null,
-    cropPixels: {
-      x: number
-      y: number
-      width: number
-      height: number
-    },
+    imageUrl: string,
+    backgroundImageContext: BackgroundImageContext,
   ): Promise<void> {
     if (!imageUrl) {
       /* Possibly remove image */
       return
     }
+
+    const cropPixels = backgroundImageContext.cropArea
+    const originalDimension = backgroundImageContext.originalDimension
 
     const { width: canvasWidth, height: canvasHeight } = this.getCanvasDimenstions()
 
@@ -892,14 +903,38 @@ export class CanvasEngine {
     /* Create image object */
     const img = await FabricImage.fromURL(imageUrl)
 
-    /* Crop and position it */
+    /* The scale factor is derived from the original crop */
+    const scaleX = cropPixels.width / originalDimension.width
+    const scaleY = cropPixels.height / originalDimension.height
+
+    /* How many image pixels we need to fill the new canvas.
+       If the canvasWidth was unchanged, the value will be the same */
+    const newCropWidth = canvasWidth * scaleX
+    const newCropHeight = canvasHeight * scaleY
+
+    /* Keep the same center point from the original crop */
+    const centerX = cropPixels.x + cropPixels.width / 2
+    const centerY = cropPixels.y + cropPixels.height / 2
+
+    /* Recompute crop origin from the center */
+    const newCropX = centerX - newCropWidth / 2
+    const newCropY = centerY - newCropHeight / 2
+
+    /* Canvas might grow larger than the picture so add a clamp */
+    const imgElement = img.getElement() as HTMLImageElement
+    const imgNaturalWidth = imgElement.naturalWidth
+    const imgNaturalHeight = imgElement.naturalHeight
+    const clampedCropX = Math.max(0, Math.min(newCropX, imgNaturalWidth - newCropWidth))
+    const clampedCropY = Math.max(0, Math.min(newCropY, imgNaturalHeight - newCropHeight))
+
+    /* Perform crop and positioning */
     img.set({
-      cropX: cropPixels.x,
-      cropY: cropPixels.y,
-      width: cropPixels.width,
-      height: cropPixels.height,
-      scaleX: canvasWidth / cropPixels.width,
-      scaleY: canvasHeight / cropPixels.height,
+      cropX: clampedCropX,
+      cropY: clampedCropY,
+      width: newCropWidth,
+      height: newCropHeight,
+      scaleX: canvasWidth / newCropWidth,
+      scaleY: canvasHeight / newCropHeight,
       left: 0,
       top: 0,
       originX: 'left',
@@ -909,7 +944,6 @@ export class CanvasEngine {
     })
 
     this.BACKGROUND_IMAGE = img
-
     this.CANVAS.add(img)
     this.CANVAS.sendObjectToBack(img)
     this.CANVAS.renderAll()

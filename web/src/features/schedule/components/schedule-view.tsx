@@ -1,7 +1,8 @@
 import { CanvasEngine } from '@/features/canvas-engine/canvas-engine'
 import { useEffect, useRef } from 'react'
 import {
-  useScheduleBackgroundImageCropArea,
+  useScheduleBackgroundImageContext,
+  useScheduleDisplay,
   useScheduleHasHydrated,
   useScheduleStore,
 } from '../store/use-schedule-store'
@@ -25,7 +26,8 @@ export default function ScheduleView() {
   const statesHydrated = hasScheduleContextHydrated && hasCanvasEngineContextHydrated
 
   const scheduleState = useScheduleStore(useShallow((s) => s))
-  const scheeduleBackgroundImageCropArea = useScheduleBackgroundImageCropArea()
+  const scheduleBackgroundImageContext = useScheduleBackgroundImageContext()
+  const scheduleDisplay = useScheduleDisplay()
 
   const canvasViewportState = useCanvasEngineStore(
     useShallow((s) => ({
@@ -66,15 +68,17 @@ export default function ScheduleView() {
   /* Change the schedule background image on change and on initial load */
   useEffect(() => {
     async function addBackgroundImage() {
-      if (!scheeduleBackgroundImageCropArea || !canvasEngine) return
+      if (!scheduleBackgroundImageContext || !canvasEngine) return
 
       const backgroundImageUrl = await getBackgroundImageDB()
       if (!backgroundImageUrl) return
 
-      await canvasEngine.addBackgroundImage(backgroundImageUrl, scheeduleBackgroundImageCropArea)
+      await canvasEngine.addBackgroundImage(backgroundImageUrl, scheduleBackgroundImageContext)
     }
     addBackgroundImage()
-  }, [scheeduleBackgroundImageCropArea, canvasEngine])
+    /* scheduleDisplay is added here so that the image will be readded to the canvas.
+    canvasEngine.render will not save the image object in the canvas if the display has changed */
+  }, [scheduleBackgroundImageContext, canvasEngine, scheduleDisplay])
 
   /* Rerender the canvas when the states changes */
   useEffect(

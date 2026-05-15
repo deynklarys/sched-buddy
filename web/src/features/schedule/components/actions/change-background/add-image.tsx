@@ -17,7 +17,7 @@ export default function AddImage({
   setDialogOpen: (open: boolean) => void
 }) {
   const canvasEngine = useCanvasEngine()
-  const { setBackgroundImageCropArea } = useScheduleActions()
+  const { setBackgroundImageContext } = useScheduleActions()
 
   const [crop, setCrop] = useState<CroppedArea>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState<Zoom>(1)
@@ -30,10 +30,15 @@ export default function AddImage({
   async function handleConfirm() {
     if (!canvasEngine || !croppedAreaPixels) return
 
+    const canvasDimension = canvasEngine.getCanvasDimenstions()
+
     /* Save image in db */
     await setBackgroundImageDB(imageUrl)
     /* Save the crop area in localStorage(zustand) which will trigger a rerender on the canvas */
-    setBackgroundImageCropArea(croppedAreaPixels)
+    setBackgroundImageContext({
+      cropArea: croppedAreaPixels,
+      originalDimension: { width: canvasDimension.width, height: canvasDimension.height },
+    })
 
     setDialogOpen(false)
   }

@@ -12,7 +12,7 @@ type ScheduleStoreActions = {
   addSubject: (subject: Subject) => void
   editSubject: (subject: Subject) => void
   deleteSubject: (subject: Subject) => void
-  setBackgroundImageCropArea: (cropArea: BackgroundImageCropArea | null) => void
+  setBackgroundImageContext: (context: BackgroundImageContext | null) => void
   setDisplay: (display: Display | null) => void
   setOrientation: (orientation: DisplayOrientation) => void
   setHasHydrated: () => void
@@ -25,17 +25,23 @@ export type Settings = {
   startOfWeek: Extract<Day, 'sunday' | 'monday'>
 }
 
-export type BackgroundImageCropArea = {
-  width: number
-  height: number
-  x: number
-  y: number
+export type BackgroundImageContext = {
+  cropArea: {
+    width: number
+    height: number
+    x: number
+    y: number
+  }
+  originalDimension: {
+    width: number
+    height: number
+  }
 }
 
 export type ScheduleStoreState = {
   settings: Settings
   subjects: Subject[]
-  backgroundImageCropArea: BackgroundImageCropArea | null
+  backgroundImageContext: BackgroundImageContext | null
   display: Display | null
   orientation: DisplayOrientation
   hasHydrated: boolean
@@ -53,7 +59,7 @@ export const useScheduleStore = create<ScheduleStoreState>()(
           showWeekend: false,
         },
         subjects: [],
-        backgroundImageCropArea: null,
+        backgroundImageContext: null,
         display: displays[0],
         hasHydrated: false,
         orientation: 'portrait',
@@ -111,7 +117,7 @@ export const useScheduleStore = create<ScheduleStoreState>()(
               subjects: state.subjects.filter((s) => s.id !== subject.id),
             }))
           },
-          setBackgroundImageCropArea: (cropArea) => set({ backgroundImageCropArea: cropArea }),
+          setBackgroundImageContext: (context) => set({ backgroundImageContext: context }),
           setDisplay: (display) => set({ display }),
           setOrientation: (orientation) => set({ orientation }),
           setHasHydrated: () => set({ hasHydrated: true }),
@@ -123,7 +129,7 @@ export const useScheduleStore = create<ScheduleStoreState>()(
       partialize: (state) => ({
         subjects: state.subjects,
         display: state.display,
-        backgroundImageCropArea: state.backgroundImageCropArea,
+        backgroundImageContext: state.backgroundImageContext,
         orientation: state.orientation,
         hasHydrated: state.hasHydrated,
       }),
@@ -138,8 +144,12 @@ export function useScheduleHasHydrated() {
   return useScheduleStore((state) => state.hasHydrated)
 }
 
-export function useScheduleBackgroundImageCropArea() {
-  return useScheduleStore((state) => state.backgroundImageCropArea)
+export function useScheduleBackgroundImageContext() {
+  return useScheduleStore((state) => state.backgroundImageContext)
+}
+
+export function useScheduleDisplay() {
+  return useScheduleStore((state) => state.display)
 }
 
 export function useScheduleActions() {
