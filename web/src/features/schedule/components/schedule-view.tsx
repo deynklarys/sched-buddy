@@ -68,7 +68,14 @@ export default function ScheduleView() {
   /* Change the schedule background image on change and on initial load */
   useEffect(() => {
     async function addBackgroundImage() {
-      if (!scheduleBackgroundImageContext || !canvasEngine) return
+      if (!statesHydrated || !canvasEngine) return
+
+      /* States have hydrated but no stored background image context.
+      So remove the background image from thee canvas */
+      if (!scheduleBackgroundImageContext) {
+        canvasEngine.removeBackgroundImage()
+        return
+      }
 
       const backgroundImageUrl = await getBackgroundImageDB()
       if (!backgroundImageUrl) return

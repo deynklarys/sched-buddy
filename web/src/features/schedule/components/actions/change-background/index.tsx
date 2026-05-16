@@ -64,7 +64,7 @@ export default function ChangeBackground() {
       setTimeout(() => {
         setImageUrl(null)
         setSelected(null)
-      }, 100)
+      }, 300)
     }
   }
 

@@ -17,6 +17,8 @@ import { inputClassNames } from '@/components/ui/input'
 import { TextBody } from '@/components/text'
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
+import { setBackgroundImageDB } from '@/features/schedule/db/background-image'
+import { useScheduleActions } from '@/features/schedule/store/use-schedule-store'
 
 function MimicCanvas({
   backgroundColor,
@@ -83,16 +85,20 @@ function toHex(color: Color) {
 
 export default function AddFill({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
   const canvasEngine = useCanvasEngine()
-  const [backgroundColor, setBackgroundColor] = useState<Color>(parseColor('#ffffff'))
+  const { setBackgroundImageContext, setBackgroundFill } = useScheduleActions()
+  const [backgroundColor, setBackgroundColor] = useState<Color>(parseColor('#32a852'))
 
   const timetableImageUrl = useMemo(() => {
     if (!canvasEngine) return null
     return canvasEngine.getTimetableImageUrl()
   }, [canvasEngine])
 
-  function onConfirm() {
-    if (!canvasEngine) return
-    canvasEngine.addBackgroundFill(toHex(backgroundColor))
+  async function onConfirm() {
+    /* Remove saved background image so canvas no longer uses it */
+    await setBackgroundImageDB(null)
+    setBackgroundImageContext(null)
+
+    setBackgroundFill(toHex(backgroundColor))
     setDialogOpen(false)
   }
 

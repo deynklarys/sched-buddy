@@ -13,6 +13,7 @@ type ScheduleStoreActions = {
   editSubject: (subject: Subject) => void
   deleteSubject: (subject: Subject) => void
   setBackgroundImageContext: (context: BackgroundImageContext | null) => void
+  setBackgroundFill: (hex: string | null) => void
   setDisplay: (display: Display | null) => void
   setOrientation: (orientation: DisplayOrientation) => void
   setHasHydrated: () => void
@@ -41,7 +42,10 @@ export type BackgroundImageContext = {
 export type ScheduleStoreState = {
   settings: Settings
   subjects: Subject[]
-  backgroundImageContext: BackgroundImageContext | null
+  background: {
+    imageContext: BackgroundImageContext | null
+    fill: string | null
+  }
   display: Display | null
   orientation: DisplayOrientation
   hasHydrated: boolean
@@ -60,6 +64,10 @@ export const useScheduleStore = create<ScheduleStoreState>()(
         },
         subjects: [],
         backgroundImageContext: null,
+        background: {
+          imageContext: null,
+          fill: '#e3463b',
+        },
         display: displays[0],
         hasHydrated: false,
         orientation: 'portrait',
@@ -117,7 +125,11 @@ export const useScheduleStore = create<ScheduleStoreState>()(
               subjects: state.subjects.filter((s) => s.id !== subject.id),
             }))
           },
-          setBackgroundImageContext: (context) => set({ backgroundImageContext: context }),
+
+          setBackgroundImageContext: (context) =>
+            set({ background: { ...get().background, imageContext: context } }),
+          setBackgroundFill: (hex) => set({ background: { ...get().background, fill: hex } }),
+
           setDisplay: (display) => set({ display }),
           setOrientation: (orientation) => set({ orientation }),
           setHasHydrated: () => set({ hasHydrated: true }),
@@ -129,7 +141,7 @@ export const useScheduleStore = create<ScheduleStoreState>()(
       partialize: (state) => ({
         subjects: state.subjects,
         display: state.display,
-        backgroundImageContext: state.backgroundImageContext,
+        background: state.background,
         orientation: state.orientation,
         hasHydrated: state.hasHydrated,
       }),
@@ -145,7 +157,7 @@ export function useScheduleHasHydrated() {
 }
 
 export function useScheduleBackgroundImageContext() {
-  return useScheduleStore((state) => state.backgroundImageContext)
+  return useScheduleStore((state) => state.background.imageContext)
 }
 
 export function useScheduleDisplay() {

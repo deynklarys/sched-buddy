@@ -87,6 +87,7 @@ export class CanvasEngine {
   private DEFAULT_START_TIME = 8 * 60
   private DEFAULT_END_TIME = 17 * 60
 
+  private DEFAULT_CANVAS_FILL = '#FFFFFF'
   private BACKGROUND_IMAGE: FabricImage | null = null
 
   private onObjectModified: SetObjectOverride | null = null
@@ -150,8 +151,6 @@ export class CanvasEngine {
   }
 
   render(state: ScheduleStoreState, viewport: ViewportState) {
-    console.log('rendering')
-
     const backgroundImage = this.BACKGROUND_IMAGE
 
     this.CANVAS.clear()
@@ -218,7 +217,17 @@ export class CanvasEngine {
       this.CANVAS.sendObjectToBack(backgroundImage)
     }
 
-    // this.CANVAS.backgroundColor = '#fb8500'
+    if (state.background.fill) {
+      if (this.BACKGROUND_IMAGE) {
+        console.warn('Schedule has both fill and image set!')
+        /* Let the image win */
+      }
+
+      this.CANVAS.backgroundColor = state.background.fill
+    } else {
+      this.CANVAS.backgroundColor = this.DEFAULT_CANVAS_FILL
+    }
+
     this.CANVAS.requestRenderAll()
   }
 
@@ -895,15 +904,20 @@ export class CanvasEngine {
     return await this.TIMETABLE_GROUP.clone()
   }
 
+  removeBackgroundImage() {
+    if (!this.BACKGROUND_IMAGE) {
+      this.BACKGROUND_IMAGE = null
+      return
+    }
+
+    this.CANVAS.remove(this.BACKGROUND_IMAGE)
+    this.BACKGROUND_IMAGE = null
+  }
+
   async addBackgroundImage(
     imageUrl: string,
     backgroundImageContext: BackgroundImageContext,
   ): Promise<void> {
-    if (!imageUrl) {
-      /* Possibly remove image */
-      return
-    }
-
     this.CANVAS.backgroundColor = '#ffffff'
 
     const cropPixels = backgroundImageContext.cropArea
@@ -913,8 +927,7 @@ export class CanvasEngine {
 
     /* If there is already an existing image, remove it */
     if (this.BACKGROUND_IMAGE) {
-      this.CANVAS.remove(this.BACKGROUND_IMAGE)
-      this.BACKGROUND_IMAGE = null
+      this.removeBackgroundImage()
     }
 
     /* Create image object */
@@ -964,17 +977,6 @@ export class CanvasEngine {
     this.CANVAS.add(img)
     this.CANVAS.sendObjectToBack(img)
     this.CANVAS.renderAll()
-  }
-
-  addBackgroundFill(hex: string) {
-    /* If there is a background image, remove it */
-    if (this.BACKGROUND_IMAGE) {
-      this.CANVAS.remove(this.BACKGROUND_IMAGE)
-      this.BACKGROUND_IMAGE = null
-    }
-
-    this.CANVAS.backgroundColor = hex
-    this.CANVAS.requestRenderAll()
   }
 
   getTimetableImageUrl() {

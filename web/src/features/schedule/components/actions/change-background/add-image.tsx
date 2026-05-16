@@ -17,7 +17,7 @@ export default function AddImage({
   setDialogOpen: (open: boolean) => void
 }) {
   const canvasEngine = useCanvasEngine()
-  const { setBackgroundImageContext } = useScheduleActions()
+  const { setBackgroundImageContext, setBackgroundFill } = useScheduleActions()
 
   const [crop, setCrop] = useState<CroppedArea>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState<Zoom>(1)
@@ -39,6 +39,7 @@ export default function AddImage({
       cropArea: croppedAreaPixels,
       originalDimension: { width: canvasDimension.width, height: canvasDimension.height },
     })
+    setBackgroundFill(null)
 
     setDialogOpen(false)
   }
