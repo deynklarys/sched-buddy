@@ -1,11 +1,12 @@
 import { TextBody } from '@/components/text'
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
+import { Slider } from '@/components/ui/slider'
 import { useCanvasEngine } from '@/features/canvas-engine/use-canvas-engine-store'
 import { setBackgroundImageDB } from '@/features/schedule/db/background-image'
 import { useScheduleActions } from '@/features/schedule/store/use-schedule-store'
 import { cn } from '@/lib/utils'
-import { FlipHorizontal2, FlipVertical2, RotateCcw, RotateCw } from 'lucide-react'
+import { FlipHorizontal2, FlipVertical2, RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Cropper, { Area } from 'react-easy-crop'
 
@@ -29,6 +30,11 @@ export default function AddImage({
   const [flipV, setFlipV] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [transformedImageUrl, setTransformedImageUrl] = useState(imageUrl)
+
+  const ZOOM = {
+    MIN: 1,
+    MAX: 10,
+  }
 
   /* Re-render the image to a canvas whenever flip/rotation changes */
   useEffect(() => {
@@ -100,6 +106,9 @@ export default function AddImage({
             crop={crop}
             zoom={zoom}
             zoomWithScroll={true}
+            minZoom={ZOOM.MIN}
+            maxZoom={ZOOM.MAX}
+            zoomSpeed={1}
             aspect={getCanvasAspectRatio()}
             onCropChange={setCrop}
             onCropComplete={onCropComplete}
@@ -108,8 +117,8 @@ export default function AddImage({
           />
         </div>
       </div>
-      <DialogFooter className='flex flex-row items-end sm:justify-between'>
-        <div className='flex items-end gap-4'>
+      <DialogFooter className='flex flex-row items-end gap-6 sm:justify-between'>
+        <div className='flex grow flex-row items-end gap-6'>
           <div className='flex flex-col gap-1'>
             <TextBody className='text-center'>Flip</TextBody>
             <div className='flex flex-row gap-2'>
@@ -153,6 +162,35 @@ export default function AddImage({
                 title='Rotate clockwise'
               >
                 <RotateCw className='h-4 w-4' />
+              </Button>
+            </div>
+          </div>
+          <div className='flex grow flex-col gap-1'>
+            <TextBody className='text-center'>Zoom</TextBody>
+            <div className='flex w-full flex-row items-center gap-2'>
+              <Button
+                variant='outline'
+                size='icon'
+                onClick={() => setZoom((prev) => Math.max(1, prev - 0.1))}
+                title='Zoom out'
+              >
+                <ZoomOut className='h-4 w-4' />
+              </Button>
+              <Slider
+                min={ZOOM.MIN}
+                max={ZOOM.MAX}
+                step={0.01}
+                value={[zoom]}
+                onValueChange={([val]) => setZoom(val)}
+                className='grow'
+              />
+              <Button
+                variant='outline'
+                size='icon'
+                onClick={() => setZoom((prev) => Math.min(5, prev + 0.1))}
+                title='Zoom in'
+              >
+                <ZoomIn className='h-4 w-4' />
               </Button>
             </div>
           </div>
