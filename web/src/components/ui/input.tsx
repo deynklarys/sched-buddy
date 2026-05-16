@@ -14,7 +14,7 @@ export const classNames = {
   base: 'w-full min-w-0 rounded-xl px-3.5 py-2 border-input border placeholder:text-border text-foreground-100 bg-background outline-none',
 }
 
-export const inputClassNames = cn(Object.values(classNames))
+export const inputClassNames = cn(Object.values(classNames), textBodyClassNames)
 
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   return (

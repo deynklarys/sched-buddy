@@ -8,11 +8,10 @@ import DeleteSubject from '@/features/schedule/components/actions/delete-subject
 import EditSubject from '@/features/schedule/components/actions/edit-subject'
 import ScheduleView from '@/features/schedule/components/schedule-view'
 import { PlusIcon } from 'lucide-react'
-import { TextBody, textHeadingSMClassNames } from '@/components/text'
+import { TextBody } from '@/components/text'
 import ChangeBackground from '@/features/schedule/components/actions/change-background'
 import { ComponentChildrenProp } from '@/types'
 import ExportSchedule from '@/features/schedule/components/actions/export-schedule'
-import { Input } from '@/components/ui/input'
 import { useScheduleActions, useScheduleStore } from '@/features/schedule/store/use-schedule-store'
 import { cn } from '@/lib/utils'
 
