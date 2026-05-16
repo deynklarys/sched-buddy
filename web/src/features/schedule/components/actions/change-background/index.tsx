@@ -14,6 +14,7 @@ import { useRef, useState } from 'react'
 import AddImage from './add-image'
 import { Input } from '@/components/ui/input'
 import Image from 'next/image'
+import AddFill from './add-fill'
 
 function Card({
   heading,
@@ -129,7 +130,7 @@ export default function ChangeBackground() {
         {selected === 'image' && (
           <AddImage imageUrl={imageUrl ?? ''} setDialogOpen={onOpenChangeWrapper} />
         )}
-        {selected === 'fill' && <div className='h-[200px] w-[1000px]'></div>}
+        {selected === 'fill' && <AddFill setDialogOpen={onOpenChangeWrapper} />}
       </DialogContent>
     </Dialog>
   )

@@ -17,6 +17,19 @@ import { Day, Meeting, Time } from '../schedule/types'
 import { Display } from '../schedule/lib/displays'
 import { SetObjectOverride, ViewportState } from './use-canvas-engine-store'
 
+export interface TimetableSnapshot {
+  imageSrc: string
+  left: number
+  top: number
+  scaleX: number
+  scaleY: number
+  angle: number
+  width: number
+  height: number
+  canvasWidth: number
+  canvasHeight: number
+}
+
 type TimetableStyle = {
   grid: {
     overlap: number
@@ -961,6 +974,21 @@ export class CanvasEngine {
     this.CANVAS.add(img)
     this.CANVAS.sendObjectToBack(img)
     this.CANVAS.renderAll()
+  }
+
+  getTimetableSnapshot(): Omit<TimetableSnapshot, 'canvasWidth' | 'canvasHeight'> | null {
+    if (!this.TIMETABLE_GROUP) return null
+    const timetableGroup = this.TIMETABLE_GROUP
+    return {
+      imageSrc: timetableGroup.toDataURL({ multiplier: 1 }),
+      left: timetableGroup.left ?? 0,
+      top: timetableGroup.top ?? 0,
+      scaleX: timetableGroup.scaleX ?? 1,
+      scaleY: timetableGroup.scaleY ?? 1,
+      angle: timetableGroup.angle ?? 0,
+      width: timetableGroup.width ?? 0,
+      height: timetableGroup.height ?? 0,
+    }
   }
 
   getCanvasDimenstions() {
