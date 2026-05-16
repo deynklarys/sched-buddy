@@ -42,7 +42,7 @@ function Sidebar() {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
-      <div className='flex h-fit flex-col gap-8 p-8'>
+      <div className='flex h-fit flex-col gap-8 p-6'>
         <ButtonGroup>
           <TextBody>Timetable</TextBody>
           <div className='flex flex-col gap-2'>
@@ -80,7 +80,10 @@ export default function SchedulePage() {
         <div className='flex grow flex-col gap-4 md:flex-row'>
           <Sidebar />
 
-          <div className='relative h-full min-h-[600px] grow rounded-xl border-2'>
+          <div
+            className='bg-background relative h-full min-h-[600px] grow rounded-xl'
+            style={{ boxShadow: 'rgba(16,16,16,0.08) 0px 0px 6px 0px' }}
+          >
             <ScheduleView />
           </div>
         </div>
